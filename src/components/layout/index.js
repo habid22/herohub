@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { LOGIN } from "../../lib/routes";
-import { useAuth } from "../../lib/auth";
+import { useAuth } from "../../hooks/auth";
 
 
 export default function Layout() {
@@ -15,7 +15,7 @@ export default function Layout() {
         if (pathname.startsWith("/protected") && !user) {
             navigate(LOGIN) 
         }
-    }, [pathname]);
+    }, [pathname, user]);
 
     if (isLoading) return "Loading...";
     
