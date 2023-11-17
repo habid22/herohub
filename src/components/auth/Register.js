@@ -20,6 +20,7 @@ import {
   usernameValidate,
 } from "../../utils/form-validate";
 
+// test
 export default function Register() {
   const { register: signup, isLoading } = useRegister();
   const {
