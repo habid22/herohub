@@ -18,40 +18,35 @@ export function useLogin() {
     const toast = useToast();
     const navigate = useNavigate();
 
-    async function login(email, password, redirectTo = {DASHBOARD}) {
+    async function login({email,password, redirectTo=DASHBOARD}) {
         setLoading(true);
 
 
         try {
-        await signInWithEmailAndPassword(auth, email, password)
-        toast({
-            title: "Logged In",
-            description: "You have successfully logged in!",
-            status: "success",
-            duration: 5000,
-            position: "top",
-            isClosable: true,
+            await signInWithEmailAndPassword(auth, email, password)
+            toast ({
+                title: "You are logged in",
+                status: "success",
+                isClosable: true,
+                position: "top",
+                duration: 5000,
         });
         navigate(redirectTo);
-
         }
-        catch (e) {
-            toast({
-                title: "Logging in failed!",
-                description: e.message,
+        catch (error){
+            toast ({
+                title: "Log in failed",
+                description: "Make sure you've entered the correct credentials!",
                 status: "error",
-                duration: 5000,
-                position: "top",
                 isClosable: true,
+                position: "top",
+                duration: 5000    
             });
             setLoading(false);
-            return false; // Return false if login failed  
+            return false; // Return false if login failed
         }
-
         setLoading(false);
-        return true; // Return true if login succeeded
+        return true // Return true if login success
     }
-
-
-    return {login, isLoading};
+    return {login, isLoading}
 }
