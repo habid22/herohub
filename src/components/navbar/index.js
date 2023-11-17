@@ -8,8 +8,7 @@ export default function Navbar() {
   const { user } = useAuth(); // Use the useAuth hook to get the current user
 
 // Check if the current user is an admin based on their email
-const isAdminUser = user?.email === "admin@gmail.com" || user?.email === "admin@uwo.ca";
-
+const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
 
   return (
     <Flex
