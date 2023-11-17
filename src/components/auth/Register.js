@@ -34,7 +34,7 @@ export default function Register() {
       username: data.username,
       email: data.email,
       password: data.password,
-      redirectTo: DASHBOARD,
+      redirectTo: LOGIN,
     });
   }
 
@@ -49,7 +49,7 @@ export default function Register() {
           <FormControl isInvalid={errors.username} py="2">
             <FormLabel>Username</FormLabel>
             <Input
-              placeholder="username"
+              placeholder="Enter a username"
               {...register("username", usernameValidate)}
             />
             <FormErrorMessage>
@@ -60,7 +60,7 @@ export default function Register() {
             <FormLabel>Email</FormLabel>
             <Input
               type="email"
-              placeholder="user@email.com"
+              placeholder="Enter an email"
               {...register("email", emailValidate)}
             />
             <FormErrorMessage>
@@ -71,7 +71,7 @@ export default function Register() {
             <FormLabel>Password</FormLabel>
             <Input
               type="password"
-              placeholder="password123"
+              placeholder="Enter a password"
               {...register("password", passwordValidate)}
             />
             <FormErrorMessage>

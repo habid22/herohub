@@ -1,4 +1,5 @@
 import {signInWithEmailAndPassword} from 'firebase/auth';
+import {sendEmailVerification} from 'firebase/auth';
 import {useAuthState} from 'react-firebase-hooks/auth';
 import {auth, db} from '../lib/firebase';
 import {useState} from 'react';
@@ -22,107 +23,123 @@ export function useAuth() {
 }
 
 export function useLogin() {
-    const[isLoading, setLoading] = useState(false);
-    const toast = useToast();
-    const navigate = useNavigate();
+  const [isLoading, setLoading] = useState(false);
+  const toast = useToast();
+  const navigate = useNavigate();
 
-    async function login({email,password, redirectTo=DASHBOARD}) {
-        setLoading(true);
+  async function login({ email, password, redirectTo = DASHBOARD }) {
+    setLoading(true);
 
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-        try {
-            await signInWithEmailAndPassword(auth, email, password)
-            toast ({
-                title: "You are logged in",
-                status: "success",
-                isClosable: true,
-                position: "top",
-                duration: 5000,
+      // Check if the user's email is verified
+      if (!userCredential.user.emailVerified) {
+        toast({
+          title: 'Email not verified',
+          description: 'Please verify your email before logging in.',
+          status: 'error',
+          isClosable: true,
+          position: 'top',
+          duration: 5000,
         });
-        navigate(redirectTo);
-        }
-        catch (error){
-            toast ({
-                title: "Log in failed",
-                description: "Make sure you've entered the correct credentials!",
-                status: "error",
-                isClosable: true,
-                position: "top",
-                duration: 5000    
-            });
-            setLoading(false);
-            return false; // Return false if login failed
-        }
         setLoading(false);
-        return true // Return true if login success
+        return false; // Return false if login failed due to unverified email
+      }
+
+      toast({
+        title: 'You are logged in',
+        status: 'success',
+        isClosable: true,
+        position: 'top',
+        duration: 5000,
+      });
+      navigate(redirectTo);
+    } catch (error) {
+      toast({
+        title: 'Log in failed',
+        description: 'Make sure you\'ve entered the correct credentials!',
+        status: 'error',
+        isClosable: true,
+        position: 'top',
+        duration: 5000,
+      });
+      setLoading(false);
+      return false; // Return false if login failed
+    } finally {
+      setLoading(false);
     }
-    return {login, isLoading}
+
+    return true; // Return true if login success
+  }
+
+  return { login, isLoading };
 }
 
 
 
+
 export function useRegister() {
-    const [isLoading, setLoading] = useState(false);
-    const toast = useToast();
-    const navigate = useNavigate();
-  
-    async function register({
-      username,
-      email,
-      password,
-      redirectTo = DASHBOARD,
-    }) {
-      setLoading(true);
-  
-      const usernameExists = await isUsernameExists(username);
-  
-      if (usernameExists) {
+  const [isLoading, setLoading] = useState(false);
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  async function register({ username, email, password, redirectTo = DASHBOARD }) {
+    setLoading(true);
+
+    const usernameExists = await isUsernameExists(username);
+
+    if (usernameExists) {
+      toast({
+        title: 'Username already exists',
+        status: 'error',
+        isClosable: true,
+        position: 'top',
+        duration: 5000,
+      });
+      setLoading(false);
+    } else {
+      try {
+        const res = await createUserWithEmailAndPassword(auth, email, password);
+
+        // Send email verification
+        await sendEmailVerification(res.user);
+
+        // Additional user creation logic
+        await setDoc(doc(db, 'users', res.user.uid), {
+          id: res.user.uid,
+          username: username.toLowerCase(),
+          avatar: '',
+          date: Date.now(),
+        });
+
         toast({
-          title: "Username already exists",
-          status: "error",
+          title: 'Account created',
+          description: 'A verification email has been sent. Please check your inbox.',
+          status: 'success',
           isClosable: true,
-          position: "top",
+          position: 'top',
           duration: 5000,
         });
+
+        navigate(redirectTo);
+      } catch (error) {
+        toast({
+          title: 'Signing Up failed',
+          description: error.message,
+          status: 'error',
+          isClosable: true,
+          position: 'top',
+          duration: 5000,
+        });
+      } finally {
         setLoading(false);
-      } else {
-        try {
-          const res = await createUserWithEmailAndPassword(auth, email, password);
-  
-          await setDoc(doc(db, "users", res.user.uid), {
-            id: res.user.uid,
-            username: username.toLowerCase(),
-            avatar: "",
-            date: Date.now(),
-          });
-  
-          toast({
-            title: "Account created",
-            description: "You are logged in",
-            status: "success",
-            isClosable: true,
-            position: "top",
-            duration: 5000,
-          });
-  
-          navigate(redirectTo);
-        } catch (error) {
-          toast({
-            title: "Signing Up failed",
-            description: error.message,
-            status: "error",
-            isClosable: true,
-            position: "top",
-            duration: 5000,
-          });
-        } finally {
-          setLoading(false);
-        }
       }
     }
-  
-    return { register, isLoading };
   }
+
+  return { register, isLoading };
+}
 
 
 
