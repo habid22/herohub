@@ -1,7 +1,12 @@
-import {Flex} from "@chakra-ui/react";
+import {Flex, Link, Button} from "@chakra-ui/react";
+import {Link as RouterLink} from "react-router-dom";
+import {DASHBOARD} from "../../lib/routes";
+import {useLogout} from "../../hooks/auth";
+
 
 
 export default function Navbar() {
+    const {logout, isLoading} = useLogout();
     return (
     <Flex
       shadow="sm"
@@ -15,6 +20,18 @@ export default function Navbar() {
       bg="white"
     >
       <Flex px="4" w="full" align="center" maxW="1200px">
+      <Link color="teal" as={RouterLink} to={DASHBOARD} fontWeight="bold">
+          Home
+        </Link>
+        <Button
+          ml="auto"
+          colorScheme="teal"
+          size="sm"
+          onClick={logout}
+          isLoading={isLoading}
+        >
+          Logout
+        </Button>
         </Flex>
     </Flex>
   );
