@@ -1,7 +1,7 @@
 // Content.js
 
 import React from "react";
-import { Flex, Button, Text, Icon, Link } from "@chakra-ui/react";
+import { Flex, Button, Text, Icon, Link, Input, Stack } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { LOGIN, REGISTER } from "../../lib/routes";
 import { FaSuperpowers } from "react-icons/fa"; // Import a superhero icon from a library (e.g., react-icons)
@@ -40,7 +40,7 @@ export default function Content() {
         </Flex>
       </Flex>
 
-      {/* Styled and centered container */}
+      {/* Styled and centered Welcome container */}
       <Flex
         mt={20}
         justify="center"
@@ -56,15 +56,43 @@ export default function Content() {
         </Text>
 
         <Text fontSize="sm" textAlign="center" mb={4}>
-           HeroHub is your go-to website for exploring the world of superheroes. Search for your favorite heroes, discover their incredible powers, and get detailed information about their background and story. Whether you're a casual fan or a dedicated enthusiast, HeroHub has you covered.
+          HeroHub is your go-to website for exploring the world of superheroes. Search for your favorite heroes, discover their incredible powers, and get detailed information about their background and story. Whether you're a casual fan or a dedicated enthusiast, HeroHub has you covered.
         </Text>
 
         <Text fontSize="sm" textAlign="center">
           To unlock even more functionalities and personalized features, create an account today. Join the community of superhero enthusiasts and take your superhero experience to the next level. Don't miss out on the excitement, {" "} 
           <Link as={RouterLink} to={REGISTER} color="teal.500">
-           sign up now!
+            sign up now!
           </Link>
         </Text>
+      </Flex>
+
+      {/* Hero Search container */}
+      <Flex
+        mt={8}
+        justify="center"
+        align="center"
+        direction="column"
+        p={4}
+        border="1px solid teal"
+        borderRadius="md"
+        maxW="800px" // Set the maxW to match the HeroHub container
+        width="31.5%" // Set the width to 80% of the HeroHub container
+      >
+        <Text fontSize="lg" fontWeight="bold" textAlign="center" mb={4}>
+          Superhero Search 🔍🦸
+        </Text>
+
+        <Stack spacing={4} align="center">
+          <Input placeholder="Hero Name" />
+          <Input placeholder="Race" />
+          <Input placeholder="Power" />
+          <Input placeholder="Publisher" />
+        </Stack>
+
+        <Button colorScheme="teal" mt={4}>
+          Search Heroes
+        </Button>
       </Flex>
     </Flex>
   );
