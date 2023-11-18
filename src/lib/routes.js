@@ -2,8 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 
 import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
-import Dashboard from "..//components/dashboard/index";
 import Layout from "../components/layout";
+import PublicNavbar from "../components/navbar/publicnavbar";
 
 
 
@@ -20,7 +20,7 @@ export const DASHBOARD = "/protected/dashboard";
 
 
 export const router = createBrowserRouter([
-    { path: ROOT, element: "Public Root" },
+    { path: ROOT, element: <PublicNavbar /> },
     { path: LOGIN, element: <Login /> },
     { path: REGISTER, element: <Register /> },
     {path: PROTECTED, element: <Layout/>, children: [
