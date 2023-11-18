@@ -3,7 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
 import Layout from "../components/layout";
-import PublicNavbar from "../components/navbar/publicnavbar";
+import Content from "../components/navbar/content";
 
 
 
@@ -20,7 +20,7 @@ export const DASHBOARD = "/protected/dashboard";
 
 
 export const router = createBrowserRouter([
-    { path: ROOT, element: <PublicNavbar /> },
+    { path: ROOT, element: <Content /> },
     { path: LOGIN, element: <Login /> },
     { path: REGISTER, element: <Register /> },
     {path: PROTECTED, element: <Layout/>, children: [
