@@ -14,7 +14,6 @@ import {
   ColorModeProvider,
   useColorMode,
   useColorModeValue,
-  InputGroup,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
@@ -90,7 +89,7 @@ function WelcomeContainer() {
       maxW="600px"
     >
       <Text fontSize="lg" fontWeight="bold" textAlign="center" mb={4}>
-        Welcome to HeroHub! 🦸☄️
+        Welcome to HeroHub! 🦸
       </Text>
 
       <Text fontSize="sm" textAlign="center" mb={4}>
@@ -121,43 +120,22 @@ function HeroSearchContainer() {
       width="31.5%"
     >
       <Text fontSize="lg" fontWeight="bold" textAlign="center" mb={4}>
-        Superhero Search 🔍🦸
+        Superhero Search 🔍
       </Text>
 
       <Stack spacing={4} align="center">
-        <InputGroup>
-          <Input placeholder="Hero Name" />
-          <Button colorScheme="teal" ml={2} w="100px"> {/* Adjust the width here */}
-            Search
-          </Button>
-        </InputGroup>
-
-        <InputGroup>
-          <Input placeholder="Race" />
-          <Button colorScheme="teal" ml={2} w="100px"> {/* Adjust the width here */}
-            Search
-          </Button>
-        </InputGroup>
-
-        <InputGroup>
-          <Input placeholder="Power" />
-          <Button colorScheme="teal" ml={2} w="100px"> {/* Adjust the width here */}
-            Search
-          </Button>
-        </InputGroup>
-
-        <InputGroup>
-          <Input placeholder="Publisher" />
-          <Button colorScheme="teal" ml={2} w="100px"> {/* Adjust the width here */}
-            Search
-          </Button>
-        </InputGroup>
+        <Input placeholder="Enter a Name..." />
+        <Input placeholder="Enter a Race..." />
+        <Input placeholder="Enter a Publisher..." />
+        <Input placeholder="Enter a Power..." />
       </Stack>
+
+      <Button colorScheme="teal" mt={4}>
+        Search for Hero
+      </Button>
     </Flex>
   );
 }
-
-
 
 function ColorModeWrapper({ children }) {
   return (
