@@ -292,56 +292,59 @@ app.get('/api/superheroes/id/:id', (req, res) => {
   }
 
   res.json({ superhero });
-});
+}); 
 
 
-// Endpoint for generic superhero search
-app.get('/api/superheroes/search', (req, res) => {
-  const { field, pattern } = req.query;
-
-  if (!field || !pattern) {
-    return res.status(400).json({ error: 'Field and pattern parameters are required' });
+app.get('/api/superheroes/multi-search', (req, res) => {
+    const { name, race, power, publisher } = req.query;
+  
+    // Sanitize user input
+    const sanitizedName = sanitizeInput(name);
+    const sanitizedRace = sanitizeInput(race);
+    const sanitizedPower = sanitizeInput(power);
+    const sanitizedPublisher = sanitizeInput(publisher);
+  
+    // Retrieve superheroes based on each criterion
+    const superheroesByName = getSuperheroesByNameWithPowers(sanitizedName);
+    const superheroesByRace = getSuperheroesByRaceWithPowers(sanitizedRace);
+    const superheroesByPower = getSuperheroesByPowerWithPowers(sanitizedPower);
+    const superheroesByPublisher = getSuperheroesByPublisherWithPowers(sanitizedPublisher);
+  
+    // Find common superheroes based on multiple criteria
+    const commonSuperheroes = findCommonSuperheroes([
+      superheroesByName,
+      superheroesByRace,
+      superheroesByPower,
+      superheroesByPublisher,
+    ]);
+  
+    // Check if any common superheroes were found
+    if (commonSuperheroes.length === 0) {
+      return res.status(404).json({ error: 'No superheroes found with the specified criteria' });
+    }
+  
+    res.json(commonSuperheroes);
+  });
+  
+  // Helper function to find common superheroes based on multiple criteria
+  function findCommonSuperheroes(superheroesArrays) {
+    if (superheroesArrays.length === 0) {
+      return [];
+    }
+  
+    // Use the first array as the base and filter based on other arrays
+    const commonSuperheroes = superheroesArrays[0].filter((hero) => {
+      for (let i = 1; i < superheroesArrays.length; i++) {
+        if (!superheroesArrays[i].some((commonHero) => commonHero.name === hero.name)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  
+    return commonSuperheroes;
   }
-
-  // Sanitize user input
-  const sanitizedPattern = sanitizeInput(pattern);
-
-  switch (field) {
-    case 'id':
-      searchSuperheroesById(sanitizedPattern, res);
-      break;
-    case 'name':
-      const matchingSuperheroesByName = getSuperheroesByNameWithPowers(sanitizedPattern);
-      if (matchingSuperheroesByName.length === 0) {
-        return res.status(404).json({ error: `No superheroes found with the name: ${sanitizedPattern}` });
-      }
-      res.json(matchingSuperheroesByName);
-      break;
-    case 'publisher':
-      const matchingSuperheroesByPublisher = getSuperheroesByPublisherWithPowers(sanitizedPattern);
-      if (matchingSuperheroesByPublisher.length === 0) {
-        return res.status(404).json({ error: `No superheroes found with the publisher: ${sanitizedPattern}` });
-      }
-      res.json(matchingSuperheroesByPublisher);
-      break;
-    case 'race':
-      const matchingSuperheroesByRace = getSuperheroesByRaceWithPowers(sanitizedPattern);
-      if (matchingSuperheroesByRace.length === 0) {
-        return res.status(404).json({ error: `No superheroes found with the race: ${sanitizedPattern}` });
-      }
-      res.json(matchingSuperheroesByRace);
-      break;
-    case 'power':
-      const matchingSuperheroesByPower = getSuperheroesByPowerWithPowers(sanitizedPattern);
-      if (matchingSuperheroesByPower.length === 0) {
-        return res.status(404).json({ error: `No superheroes found with the power: ${sanitizedPattern}` });
-      }
-      res.json(matchingSuperheroesByPower);
-      break;
-    default:
-      res.status(400).json({ error: 'Invalid search field' });
-  }
-});
+  
 
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -357,10 +360,10 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something went wrong!');
 });
 
-// Route to serve the front-end application
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/index.html'));
-});
+// // Route to serve the front-end application
+// app.get('/', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../client/index.html'));
+// });
 
 // Starting the server
 app.listen(PORT, () => {
