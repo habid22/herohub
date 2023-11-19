@@ -50,7 +50,7 @@ const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
           isLoading={isLoading}
           ml="auto" // Move the Logout button to the right
         >
-          Logout
+          Log Out
         </Button>
       </Flex>
     </Flex>
