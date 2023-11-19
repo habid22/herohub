@@ -14,6 +14,7 @@ import {
   ColorModeProvider,
   useColorMode,
   useColorModeValue,
+  InputGroup,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
@@ -124,18 +125,39 @@ function HeroSearchContainer() {
       </Text>
 
       <Stack spacing={4} align="center">
-        <Input placeholder="Hero Name" />
-        <Input placeholder="Race" />
-        <Input placeholder="Power" />
-        <Input placeholder="Publisher" />
-      </Stack>
+        <InputGroup>
+          <Input placeholder="Hero Name" />
+          <Button colorScheme="teal" ml={2} w="100px"> {/* Adjust the width here */}
+            Search
+          </Button>
+        </InputGroup>
 
-      <Button colorScheme="teal" mt={4}>
-        Search Heroes
-      </Button>
+        <InputGroup>
+          <Input placeholder="Race" />
+          <Button colorScheme="teal" ml={2} w="100px"> {/* Adjust the width here */}
+            Search
+          </Button>
+        </InputGroup>
+
+        <InputGroup>
+          <Input placeholder="Power" />
+          <Button colorScheme="teal" ml={2} w="100px"> {/* Adjust the width here */}
+            Search
+          </Button>
+        </InputGroup>
+
+        <InputGroup>
+          <Input placeholder="Publisher" />
+          <Button colorScheme="teal" ml={2} w="100px"> {/* Adjust the width here */}
+            Search
+          </Button>
+        </InputGroup>
+      </Stack>
     </Flex>
   );
 }
+
+
 
 function ColorModeWrapper({ children }) {
   return (
