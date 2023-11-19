@@ -4,8 +4,6 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const fs = require('fs');
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
 
 // Use CORS middleware with origin option
 app.use(cors({ origin: 'http://localhost:3000' }));
@@ -25,30 +23,6 @@ function readSuperheroPowers() {
   const data = fs.readFileSync(path.join(__dirname, 'super_hero_powers.json'), 'utf-8');
   return JSON.parse(data);
 }
-
-
-// DATABASE SET UP WITH LOWDB
-
-// Define the file path for lists.json
-const listsFilePath = path.join(__dirname, 'lists.json');
-// Create a database instance and initialize it with the file path
-const adapter = new FileSync(listsFilePath);
-// Create a lowdb instance using the adapter
-const db = low(adapter);
-
-// Initialize the database if the file does not exist
-if (!fs.existsSync(listsFilePath)) {
-  db.defaults({}).write();
-}
-
-const readListsFromFile = () => {
-  return db.getState();
-};
-
-const writeListsToFile = (lists) => {
-  db.setState(lists).write();
-};
-
 
 
 // FUNCTIONS FOR SEARCHING SUPERHEROES
@@ -371,123 +345,6 @@ app.get('/api/superheroes/search', (req, res) => {
 
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-// LISTS ENDPOINTS
-
-const sanitizeListInput = (input) => {
-  // Remove trailing spaces and leading spaces
-  return input.replace(/\s+$/, '').replace(/^\s+/, '');
-};
-
-// Endpoint to create a list (USED BY CREATE LIST)
-app.post('/api/lists', (req, res) => {
-  const { name } = req.body;
-
-  // Validate input
-  if (!name) {
-    return res.status(400).json({ error: 'List name is required' });
-  }
-
-  // Sanitize input for lists
-  const sanitizedListName = sanitizeListInput(name);
-
-  // Additional validation if needed
-  // For example, you might want to check if the sanitizedListName meets certain criteria
-  // Here, we'll ensure the sanitizedListName is not empty after removing leading and trailing spaces
-  if (!sanitizedListName) {
-    return res.status(400).json({ error: 'Invalid list name' });
-  }
-
-  const lists = readListsFromFile();
-
-  // Check if the sanitized name already exists
-  if (lists[sanitizedListName]) {
-    return res.status(400).json({ error: 'List name already exists' });
-  }
-
-  // Create the list and write it to the file
-  lists[sanitizedListName] = [];
-  writeListsToFile(lists);
-
-  res.status(201).json({ message: `List ${sanitizedListName} created successfully` });
-});
-
-
-// 6. Endpoint responsible for updating an existing list (USED BY ADD HERO TO LIST)
-app.put('/api/lists/:name', (req, res) => {
-  const { name } = req.params;
-  const lists = readListsFromFile();
-  if (!lists[name]) {
-      return res.status(404).send('List name does not exist');
-  }
-  const newSuperheroIds = req.body.superheroIds;
-  if (!Array.isArray(newSuperheroIds) || !newSuperheroIds.every(isValidId)) {
-      return res.status(400).send('Invalid superhero IDs format');
-  }
-
-  lists[name] = [...new Set([...lists[name], ...newSuperheroIds])];
-  writeListsToFile(lists);
-  res.send(`List ${name} updated successfully`);
-});
-
-
-//  Endpoint responsible for getting a list content (USED BY DISPLAY LIST CONTENT)
-app.get('/api/lists/:name', (req, res) => {
-  const { name } = req.params;
-  const lists = readListsFromFile();
-  console.log('Requested list name:', name);
-  console.log('All lists:', lists);
-
-  if (!lists[name]) {
-      console.log('List not found!!');
-      return res.status(404).send('List not found');
-  }
-
-  res.json(lists[name]);
-});
-
-// 8. Endpoint responsible for deleting a list (USED BY DELETING A LIST)
-app.delete('/api/lists/:name', (req, res) => {
-  const { name } = req.params;
-  const lists = readListsFromFile();
-  if (!lists[name]) {
-      return res.status(404).send('List not found');
-  }
-  delete lists[name];
-  writeListsToFile(lists);
-  res.send(`List ${name} deleted successfully`);
-});
-
-
-// 7. Endpoint responsible for getting heroes from a list using their IDs (USED BY DISPLAY LIST CONTENT)
-app.get('/api/lists/:name/heroes', (req, res) => {
-  const { name } = req.params;
-  const lists = readListsFromFile();
-
-  if (!lists[name]) {
-    return res.status(404).send('List not found');
-  }
-
-  const heroes = lists[name].map(id => {
-    const info = getSuperheroInfoById(id);
-
-    if (!info) {
-      return { error: `Superhero with ID ${id} not found` };
-    }
-
-    return { info };
-  });
-
-  res.json(heroes);
-});
-
-
-// Endpoint to get a list of all lists (USED BY VIEWLISTS)
-app.get('/api/lists', (req, res) => {
-  const lists = readListsFromFile();
-  res.json(Object.keys(lists));
-});
-
 
 // 10. MIDDLEWARE AND ROUTES FOR THE FRONT-END APPLICATION
 
