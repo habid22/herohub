@@ -6,7 +6,8 @@ const PORT = process.env.PORT || 4000;
 const fs = require('fs');
 
 // Use CORS middleware with origin option
-app.use(cors({ origin: 'http://localhost:4000' }));
+app.use(cors({ origin: 'http://localhost:3000' }));
+
 
 // Serve static files from the build directory
 app.use(express.static(path.join(__dirname, '..', 'build')));

@@ -14,11 +14,13 @@ import {
   ColorModeProvider,
   useColorMode,
   useColorModeValue,
+  useToast
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
 import { LOGIN, REGISTER } from "../../lib/routes";
 import { FaSuperpowers, FaMoon, FaSun } from "react-icons/fa";
+import axios from "axios";
 
 export default function Content() {
   return (
@@ -107,6 +109,48 @@ function WelcomeContainer() {
 }
 
 function HeroSearchContainer() {
+  const [searchParams, setSearchParams] = useState({
+    name: "",
+    race: "",
+    publisher: "",
+    power: "",
+  });
+
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchClicked, setSearchClicked] = useState(false); // New state variable
+  const toast = useToast();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSearchParams((prevSearchParams) => ({
+      ...prevSearchParams,
+      [name]: value,
+    }));
+  };
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get("http://localhost:4000/api/superheroes/multi-search", {
+        params: searchParams,
+      });
+
+      // Set the search results in the state
+      setSearchResults(response.data);
+
+      // Update searchClicked to true
+      setSearchClicked(true);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while fetching superhero data.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <Flex
       mt={8}
@@ -117,25 +161,128 @@ function HeroSearchContainer() {
       border="1px solid teal"
       borderRadius="md"
       maxW="800px"
-      width="31.5%"
+      width="50%"
     >
-      <Text fontSize="lg" fontWeight="bold" textAlign="center" mb={4}>
-        Superhero Search 🔍
+      <Text fontSize="xl" fontWeight="bold" mb={4}>
+        Superhero Search 🔎
       </Text>
 
       <Stack spacing={4} align="center">
-        <Input placeholder="Enter a Name..." />
-        <Input placeholder="Enter a Race..." />
-        <Input placeholder="Enter a Publisher..." />
-        <Input placeholder="Enter a Power..." />
+        <Input
+          name="name"
+          placeholder="Enter a Name..."
+          value={searchParams.name}
+          onChange={handleInputChange}
+        />
+        <Input
+          name="race"
+          placeholder="Enter a Race..."
+          value={searchParams.race}
+          onChange={handleInputChange}
+        />
+        <Input
+          name="publisher"
+          placeholder="Enter a Publisher..."
+          value={searchParams.publisher}
+          onChange={handleInputChange}
+        />
+        <Input
+          name="power"
+          placeholder="Enter a Power..."
+          value={searchParams.power}
+          onChange={handleInputChange}
+        />
       </Stack>
 
-      <Button colorScheme="teal" mt={4}>
+      <Button colorScheme="teal" mt={4} onClick={handleSearch}>
         Search for Hero
       </Button>
+
+      {/* Display search results using the SearchResults component if search has been clicked */}
+      {searchClicked && (
+        <Flex mt={4} p={4} border="1px solid teal" borderRadius="md" width="100%" direction="column">
+          <SearchResults results={searchResults} />
+        </Flex>
+      )}
     </Flex>
   );
 }
+
+
+// New SearchResults component with "View More" option
+function SearchResults({ results }) {
+  return (
+    <Stack>
+      <Text fontSize="lg" fontWeight="bold" mb={2}>
+        Search Results
+      </Text>
+
+      {/* Display name and publisher of each item in the results */}
+      {results.map((result, index) => (
+        <SuperheroItem key={index} superhero={result} />
+      ))}
+    </Stack>
+  );
+}
+
+function SuperheroItem({ superhero }) {
+  const [showDetails, setShowDetails] = useState(false);
+
+  const handleToggleDetails = () => {
+    setShowDetails(!showDetails);
+  };
+
+  return (
+    <Flex flexDirection="column" width="100%" mb={4}>
+      {/* Superhero name with bold font */}
+      <Text fontWeight="bold">{superhero.name}</Text>
+
+      {/* Publisher line */}
+      <Text>
+        Publisher: {superhero.Publisher}
+      </Text>
+
+      {/* "View More" button */}
+      <Button size="sm" onClick={handleToggleDetails} mt={2}>
+        {showDetails ? 'View Less' : 'View More'}
+      </Button>
+
+      {/* Additional details */}
+      {showDetails && (
+        <Flex flexDirection="column" mt={2}>
+          <Text>
+            Gender: {superhero.Gender}
+          </Text>
+          <Text>
+            Eye color: {superhero['Eye color']}
+          </Text>
+          <Text>
+            Race: {superhero.Race}
+          </Text>
+          <Text>
+            Hair color: {superhero['Hair color']}
+          </Text>
+          <Text>
+            Height: {superhero.Height}
+          </Text>
+          {/* Powers */}
+          <Text>
+            Powers: {superhero.powers && superhero.powers.length > 0 ? superhero.powers.join(', ') : 'N/A'}
+          </Text>
+          {/* Add more fields as needed */}
+        </Flex>
+      )}
+    </Flex>
+  );
+}
+
+
+
+
+
+
+
+
 
 function ColorModeWrapper({ children }) {
   return (
