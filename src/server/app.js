@@ -2,11 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 const fs = require('fs');
 
 // Use CORS middleware with origin option
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'http://localhost:4000' }));
 
 
 // Middleware to parse JSON bodies
