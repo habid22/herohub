@@ -246,7 +246,10 @@ function SuperheroItem({ superhero }) {
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
       {/* Superhero name with bold font */}
-      <Text fontWeight="bold">{superhero.name}</Text>
+      <Text fontWeight="bold" fontSize="xl">
+        {superhero.name}
+      </Text>
+
 
       {/* Publisher line with bold font */}
       <Text>
