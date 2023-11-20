@@ -8,6 +8,10 @@ const fs = require('fs');
 // Use CORS middleware with origin option
 app.use(cors({ origin: 'http://localhost:4000' }));
 
+// Serve static files from the build directory
+app.use(express.static(path.join(__dirname, '..', 'build')));
+
+
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -360,10 +364,10 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something went wrong!');
 });
 
-// // Route to serve the front-end application
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../client/index.html'));
-// });
+// Catch-all route for React Router
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+});
 
 // Starting the server
 app.listen(PORT, () => {
