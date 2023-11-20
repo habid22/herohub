@@ -33,7 +33,7 @@
   },
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "node src/server/app.js",
+    "server": "node server/app.js",
     "client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

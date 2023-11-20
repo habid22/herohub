@@ -246,60 +246,6 @@ function getSuperheroInfoById(id) {
 }
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-// ENDPOINTS 
-
-// Endpoint to get superheroes by power
-app.get('/superheroes/power/:power', (req, res) => {
-  const power = req.params.power;
-  const trueSuperheroes = getSuperheroesByPower(power);
-
-  if (trueSuperheroes.length === 0) {
-    return res.status(404).json({ error: `No superheroes found with the power: ${power}` });
-  }
-
-  res.json(trueSuperheroes);
-});
-
-
-// Endpoint to get superhero powers by name
-app.get('/SuperHeroByNamePowers/:name', (req, res) => {
-  const name = req.params.name;
-  const superhero = getSuperheroByNamePowers(name);
-
-  if (!superhero) {
-    return res.status(404).json({ error: 'Superhero not found' });
-  }
-
-  res.json({ superhero });
-});
-
-
-// Endpoint to get a list of all unique publishers
-app.get('/api/publishers', (req, res) => {
-  const publishers = getUniquePublishers();
-  res.json(publishers);
-});
-
-
-// Endpoint to get superhero data by ID
-app.get('/api/superheroes/id/:id', (req, res) => {
-  const { id } = req.params;
-
-  if (!id) {
-    return res.status(400).json({ error: 'ID is required' });
-  }
-
-  const superhero = getSuperheroById(id);
-
-  if (!superhero) {
-    return res.status(404).json({ error: 'Superhero not found' });
-  }
-
-  res.json({ superhero });
-}); 
-
-
 app.get('/api/superheroes/multi-search', (req, res) => {
     const { name, race, power, publisher } = req.query;
   
