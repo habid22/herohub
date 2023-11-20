@@ -1,6 +1,6 @@
 // Content.js
 
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import {
   Flex,
   Button,
@@ -14,7 +14,8 @@ import {
   ColorModeProvider,
   useColorMode,
   useColorModeValue,
-  useToast
+  useToast,
+  Divider,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
@@ -214,13 +215,16 @@ function HeroSearchContainer() {
 function SearchResults({ results }) {
   return (
     <Stack>
-      <Text fontSize="lg" fontWeight="bold" mb={2}>
+      <Text fontSize="lg" fontWeight="bold" mb={2} textAlign="center">
         Search Results
       </Text>
 
       {/* Display name and publisher of each item in the results */}
       {results.map((result, index) => (
-        <SuperheroItem key={index} superhero={result} />
+        <Fragment key={index}>
+          <SuperheroItem superhero={result} />
+          {index < results.length - 1 && <Divider mt={4} mb={4} />}
+        </Fragment>
       ))}
     </Stack>
   );
@@ -233,7 +237,12 @@ function SuperheroItem({ superhero }) {
     setShowDetails(!showDetails);
   };
 
-  
+  const handleSearchOnDDG = () => {
+    const searchQuery = superhero.name.replace(/\s+/g, '+');
+    const searchUrl = `https://duckduckgo.com/?q=${searchQuery}`;
+    window.open(searchUrl, '_blank');
+  };
+
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
       {/* Superhero name with bold font */}
@@ -272,6 +281,12 @@ function SuperheroItem({ superhero }) {
             <span style={{ fontWeight: 'bold' }}>Powers:</span>{' '}
             {superhero.powers && superhero.powers.length > 0 ? superhero.powers.join(', ') : 'N/A'}
           </Text>
+          {/* Search on DDG link */}
+          <Text textAlign="center" mt={2}>
+  <Link onClick={handleSearchOnDDG} color="teal.500" cursor="pointer">
+    Open in DuckDuckGo
+  </Link>
+</Text>
           {/* Add more fields as needed */}
         </Flex>
       )}
