@@ -161,7 +161,7 @@ function HeroSearchContainer() {
       border="1px solid teal"
       borderRadius="md"
       maxW="800px"
-      width="50%"
+      width="55%"
     >
       <Text fontSize="xl" fontWeight="bold" mb={4}>
         Superhero Search 🔎
@@ -232,14 +232,15 @@ function SuperheroItem({ superhero }) {
     setShowDetails(!showDetails);
   };
 
+  
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
       {/* Superhero name with bold font */}
       <Text fontWeight="bold">{superhero.name}</Text>
 
-      {/* Publisher line */}
+      {/* Publisher line with bold font */}
       <Text>
-        Publisher: {superhero.Publisher}
+        <span style={{ fontWeight: 'bold' }}>Publisher:</span> {superhero.Publisher}
       </Text>
 
       {/* "View More" button */}
@@ -251,23 +252,24 @@ function SuperheroItem({ superhero }) {
       {showDetails && (
         <Flex flexDirection="column" mt={2}>
           <Text>
-            Gender: {superhero.Gender}
+            <span style={{ fontWeight: 'bold' }}>Gender:</span> {superhero.Gender}
           </Text>
           <Text>
-            Eye color: {superhero['Eye color']}
+            <span style={{ fontWeight: 'bold' }}>Eye color:</span> {superhero['Eye color']}
           </Text>
           <Text>
-            Race: {superhero.Race}
+            <span style={{ fontWeight: 'bold' }}>Race:</span> {superhero.Race}
           </Text>
           <Text>
-            Hair color: {superhero['Hair color']}
+            <span style={{ fontWeight: 'bold' }}>Hair color:</span> {superhero['Hair color']}
           </Text>
           <Text>
-            Height: {superhero.Height}
+            <span style={{ fontWeight: 'bold' }}>Height:</span> {superhero.Height}
           </Text>
           {/* Powers */}
           <Text>
-            Powers: {superhero.powers && superhero.powers.length > 0 ? superhero.powers.join(', ') : 'N/A'}
+            <span style={{ fontWeight: 'bold' }}>Powers:</span>{' '}
+            {superhero.powers && superhero.powers.length > 0 ? superhero.powers.join(', ') : 'N/A'}
           </Text>
           {/* Add more fields as needed */}
         </Flex>
