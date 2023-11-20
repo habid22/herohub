@@ -22,6 +22,7 @@ import { LOGIN, REGISTER } from "../../lib/routes";
 import { FaSuperpowers, FaMoon, FaSun } from "react-icons/fa";
 import axios from "axios";
 
+
 export default function Content() {
   return (
     <ChakraProvider>
