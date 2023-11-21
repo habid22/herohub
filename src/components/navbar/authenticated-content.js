@@ -15,8 +15,6 @@ import {
   useToast,
   Divider,
 } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
-import { DASHBOARD } from "../../lib/routes";
 import { useLogout, useAuth } from "../../hooks/auth"; // Import useAuth
 import { FaSuperpowers } from "react-icons/fa";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
