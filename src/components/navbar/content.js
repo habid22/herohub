@@ -297,14 +297,6 @@ function SuperheroItem({ superhero }) {
   );
 }
 
-
-
-
-
-
-
-
-
 function ColorModeWrapper({ children }) {
   return (
     <ColorModeProvider options={{ useSystemColorMode: false }}>
