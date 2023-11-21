@@ -9,7 +9,7 @@ import {useNavigate} from 'react-router-dom';
 import {LOGIN} from '../lib/routes';
 import {useSignOut} from 'react-firebase-hooks/auth';
 import {setDoc, doc} from 'firebase/firestore';
-
+import jwt_decode from 'jwt-decode';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
 import isUsernameExists from '../utils/isUsernameExist';
 
@@ -46,6 +46,12 @@ export function useLogin() {
         setLoading(false);
         return false; // Return false if login failed due to unverified email
       }
+      // Get JWT token
+      const idToken = await userCredential.user.getIdToken();
+      console.log('JWT Token:', idToken);
+      // Store JWT token in local storage
+      localStorage.setItem('token', idToken);
+
 
       toast({
         title: 'You are logged in',
@@ -149,6 +155,7 @@ export function useLogout() {
     const navigate = useNavigate();
   
     async function logout() {
+      
       if (await signOut()) {
         toast({
           title: "Successfully logged out",
@@ -157,7 +164,9 @@ export function useLogout() {
           position: "top",
           duration: 5000,
         });
+        localStorage.removeItem('token');
         navigate(LOGIN);
+        
       } // else: show error [signOut() returns false if failed]
     }
   
