@@ -451,7 +451,7 @@ function PublicLists() {
       width="55%"
     >
       <Text fontSize="xl" fontWeight="bold" mb={4}>
-        View Public Lists 📋
+        Public Hero Lists 🦸
       </Text>
       {/* Include ViewPublicLists component here */}
       <ViewPublicLists />
@@ -464,15 +464,33 @@ function PublicLists() {
 function ViewPublicLists() {
   const [lists, setLists] = useState([]);
   const [selectedList, setSelectedList] = useState(null);
-  const [listDetails, setListDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [listDetails, setListDetails] = useState({});
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch the list of all lists
+    // Fetch the list of all lists and their details
     axios
       .get('http://localhost:4000/api/lists')
       .then((response) => {
         setLists(response.data);
+
+        // Fetch detailed information for each list
+        const detailRequests = response.data.map((listName) =>
+          axios.get(`http://localhost:4000/api/lists/${listName}`)
+        );
+
+        Promise.all(detailRequests)
+          .then((detailResponses) => {
+            const detailsMap = {};
+            detailResponses.forEach((response, index) => {
+              detailsMap[response.data.listName] = response.data;
+            });
+            setListDetails(detailsMap);
+          })
+          .catch((error) => {
+            console.error('Error fetching list details:', error);
+          });
       })
       .catch((error) => {
         console.error('Error fetching lists:', error);
@@ -480,38 +498,38 @@ function ViewPublicLists() {
   }, []);
 
   const handleViewMore = (listName) => {
-    // Set loading to true when starting to fetch details
-    setLoading(true);
+    // Set details loading to true when starting to fetch details
+    setDetailsLoading(true);
 
-    // Fetch detailed information about the selected list
-    axios
-      .get(`http://localhost:4000/api/lists/${listName}`)
-      .then((response) => {
-        setListDetails(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching list details:', error);
-      });
+    // If the selected list is the same as the one being displayed, hide details
+    if (selectedList === listName) {
+      setSelectedList(null);
+      setDetailsLoading(false); // Set details loading to false when hiding details
+    } else {
+      // Set the selected list for display
+      setSelectedList(listName);
 
-    // Fetch heroes from the selected list
-    axios
-      .get(`http://localhost:4000/api/lists/${listName}/heroes`)
-      .then((response) => {
-        setListDetails((prevDetails) => ({
-          ...prevDetails,
-          heroes: response.data,
-        }));
-      })
-      .catch((error) => {
-        console.error('Error fetching list heroes:', error);
-      })
-      .finally(() => {
-        // Set loading to false after fetching is complete
-        setLoading(false);
-      });
+      // Fetch detailed information about the selected list
+      axios
+        .get(`http://localhost:4000/api/lists/${listName}`)
+        .then((response) => {
+          setListDetails((prevDetails) => ({
+            ...prevDetails,
+            [listName]: response.data,
+          }));
+        })
+        .catch((error) => {
+          console.error('Error fetching list details:', error);
+        })
+        .finally(() => {
+          // Set details loading to false after fetching is complete
+          setDetailsLoading(false);
+        });
+    }
+  };
 
-    // Set the selected list for display
-    setSelectedList(listName);
+  const handleHideDetails = () => {
+    setSelectedList(null);
   };
 
   return (
@@ -525,23 +543,25 @@ function ViewPublicLists() {
           <Text fontWeight="bold" fontSize="xl">
             List Name: {listName}
           </Text>
+          {/* Display Created by information if available */}
           <Text>
-            Created by: {listDetails && listDetails.created_by}
+            Created by: {listDetails[listName]?.created_by || 'Not available'}
           </Text>
           <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
             {selectedList === listName ? 'Hide Details' : 'View Details'}
           </Button>
 
-          {selectedList === listName && listDetails && !loading && (
+          {selectedList === listName && listDetails[listName] && !detailsLoading && (
             <Flex flexDirection="column" mt={2}>
               <Text>
-                <span style={{ fontWeight: 'bold' }}>Description:</span> {listDetails.description}
+                <span style={{ fontWeight: 'bold' }}>Description:</span>{' '}
+                {listDetails[listName].description}
               </Text>
               <Text fontWeight="bold" mt={2}>
                 Heroes:
               </Text>
-              {listDetails.heroes &&
-                listDetails.heroes.map((hero) => (
+              {listDetails[listName].heroes &&
+                listDetails[listName].heroes.map((hero) => (
                   <Flex key={hero.info.id} flexDirection="column" mt={2}>
                     <Text>
                       <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
@@ -553,9 +573,20 @@ function ViewPublicLists() {
           )}
         </Flex>
       ))}
+
+      {/* Place the "Hide Details" button outside the loop
+      {selectedList !== null && !detailsLoading && (
+        <Button size="sm" onClick={handleHideDetails} mt={2}>
+          Hide Details
+        </Button>
+      )} */}
     </Flex>
   );
 }
+
+
+
+
 
 
 

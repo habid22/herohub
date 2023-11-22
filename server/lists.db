@@ -1,5 +1,4 @@
 {
-  
   "MyNewList": {
     "data": [],
     "created_by": "User123"
@@ -8,6 +7,10 @@
     "data": [],
     "created_by": "hs27",
     "description": "This is a new list for testing."
+  },
+  "CanYouSeeThis": {
+    "data": [],
+    "created_by": "habid22",
+    "description": "Hey, this is my first list!"
   }
- 
 }
