@@ -1,6 +1,6 @@
 {
   "MyNewList": {
-    "data": [],
+    "data": [1,2,3,4],
     "created_by": "User123"
   },
   "hassan": {
