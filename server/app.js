@@ -5,6 +5,10 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const fs = require('fs');
 
+
+// What I need to tomorrow is: make a new API call for logged in users, which will take the current logged in user's JWT token and verify it is the correct JWT token to use the search functionality.
+// So basically verify the JWT token and then use the search functionality.  
+
 // Use CORS middleware with origin option
 app.use(cors({ origin: 'http://localhost:3000' }));
 
