@@ -517,12 +517,29 @@ function ViewPublicLists() {
             ...prevDetails,
             [listName]: response.data,
           }));
+
+          // Fetch heroes from the selected list
+          axios
+            .get(`http://localhost:4000/api/lists/${listName}/heroes`)
+            .then((heroesResponse) => {
+              setListDetails((prevDetails) => ({
+                ...prevDetails,
+                [listName]: {
+                  ...prevDetails[listName],
+                  heroes: heroesResponse.data,
+                },
+              }));
+            })
+            .catch((error) => {
+              console.error('Error fetching list heroes:', error);
+            })
+            .finally(() => {
+              // Set details loading to false after fetching is complete
+              setDetailsLoading(false);
+            });
         })
         .catch((error) => {
           console.error('Error fetching list details:', error);
-        })
-        .finally(() => {
-          // Set details loading to false after fetching is complete
           setDetailsLoading(false);
         });
     }
@@ -557,18 +574,25 @@ function ViewPublicLists() {
                 <span style={{ fontWeight: 'bold' }}>Description:</span>{' '}
                 {listDetails[listName].description}
               </Text>
-              <Text fontWeight="bold" mt={2}>
-                Heroes:
+              <Text fontWeight="bold" mt={2} textAlign="center" fontSize="lg">
+                List Details
               </Text>
               {listDetails[listName].heroes &&
-                listDetails[listName].heroes.map((hero) => (
-                  <Flex key={hero.info.id} flexDirection="column" mt={2}>
-                    <Text>
-                      <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
-                    </Text>
-                    {/* Display other hero information as needed */}
-                  </Flex>
-                ))}
+              listDetails[listName].heroes.map((hero) => (
+                <Flex key={hero.info.id} flexDirection="column" mt={2}>
+                  <Text>
+                    <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
+                  </Text>
+                  <Text>
+                    <span style={{ fontWeight: 'bold' }}>Publisher:</span> {hero.info.publisher}
+                  </Text>
+                  <Text>
+                    <span style={{ fontWeight: 'bold' }}>Powers:</span> {hero.info.powers.join(', ')}
+                  </Text>
+                  {/* Display other hero information as needed */}
+                  <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
+                </Flex>
+              ))}
             </Flex>
           )}
         </Flex>
@@ -583,6 +607,7 @@ function ViewPublicLists() {
     </Flex>
   );
 }
+
 
 
 
