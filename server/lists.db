@@ -1,0 +1,79 @@
+{
+  "myNewList": {
+    "created_by": "user123",
+    "description": "yay this is my new list",
+    "data": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      37,
+      27
+    ]
+  },
+  "Marvel Heroes": {
+    "created_by": "user456",
+    "description": "Marvel Heroes",
+    "data": [
+      2,
+      9,
+      69,
+      0
+    ]
+  },
+  "MyNewList": {
+    "data": [],
+    "created_by": "User123"
+  },
+  "hassan": {
+    "data": [],
+    "created_by": "hs27",
+    "description": "This is a new list for testing."
+  },
+  "hubtest": {
+    "data": [],
+    "created_by": "mnm",
+    "description": "test"
+  },
+  "test123": {
+    "data": [],
+    "created_by": "habid22",
+    "description": "2342342"
+  },
+  "bat": {
+    "data": [],
+    "created_by": "hassanaminsheikh@gmail.com",
+    "description": "batman family"
+  },
+  "batman": {
+    "data": [],
+    "created_by": "hassanaminsheikh@gmail.com",
+    "description": "this is a l ist"
+  },
+  "this is a test": {
+    "data": [],
+    "created_by": "hassanaminsheikh@gmail.com",
+    "description": "test"
+  },
+  "this": {
+    "data": [],
+    "created_by": "habid22",
+    "description": "list"
+  },
+  "anotherList": {
+    "data": [],
+    "created_by": "habid22",
+    "description": "123"
+  },
+  "abid_list": {
+    "data": [],
+    "created_by": "testuser22",
+    "description": "sample list"
+  },
+  "testhublist": {
+    "data": [],
+    "created_by": "habid22",
+    "description": "sample list"
+  }
+}

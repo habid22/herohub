@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import {
   Flex,
   Button,
@@ -14,6 +14,7 @@ import {
   useColorModeValue,
   useToast,
   Divider,
+  Checkbox,
 } from "@chakra-ui/react";
 import { useLogout, useAuth } from "../../hooks/auth"; // Import useAuth
 import { FaSuperpowers } from "react-icons/fa";
@@ -33,6 +34,8 @@ export default function LogInContent() {
       <Header />
       <WelcomeContainer />
       <HeroSearchContainer />
+      <CreateList />
+      <PublicLists />
     </Flex>
     </ColorModeWrapper>
   </ChakraProvider>
@@ -102,6 +105,9 @@ function Header() {
 }
 
 function WelcomeContainer() {
+  // Use the useAuth hook to get information about the logged-in user
+  const { user } = useAuth();
+
   return (
     <Flex
       mt={20}
@@ -113,9 +119,16 @@ function WelcomeContainer() {
       borderRadius="md"
       maxW="600px"
     >
-      <Text fontSize="lg" fontWeight="bold" textAlign="center" mb={4}>
-        Welcome to HeroHub! 🦸
-      </Text>
+      {/* Replace the welcome message with the username if the user is logged in */}
+      {user ? (
+        <Text fontSize="lg" fontWeight="bold" textAlign="center" mb={4}>
+          Logged in as: {user.username} 🦸
+        </Text>
+      ) : (
+        <Text fontSize="lg" fontWeight="bold" textAlign="center" mb={4}>
+          Welcome to HeroHub! 🦸
+        </Text>
+      )}
 
       <Text fontSize="sm" textAlign="center" mb={4}>
         Thank you for using our service. Explore the world of superheroes and enjoy your experience on HeroHub!
@@ -310,6 +323,241 @@ function SuperheroItem({ superhero }) {
     </Flex>
   );
 }
+
+
+function CreateList() {
+  const { user } = useAuth();
+  const toast = useToast();
+
+  const [listParams, setListParams] = useState({
+    name: "",
+    created_by: "",
+    description: "",
+  });
+
+  const [listCreated, setListCreated] = useState(false);
+
+  useEffect(() => {
+    if (user && !listParams.created_by) {
+      setListParams((prevListParams) => ({
+        ...prevListParams,
+        created_by: user.username || "",
+      }));
+    }
+  }, [user, listParams.created_by]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setListParams((prevListParams) => ({
+      ...prevListParams,
+      [name]: value,
+    }));
+  };
+
+  const handleCreateList = async () => {
+    try {
+      console.log('Request Data:', listParams);
+      const response = await axios.post("http://localhost:4000/api/lists", listParams);
+
+      setListCreated(true);
+
+      toast({
+        title: "Success",
+        description: response.data.message,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error creating list:", error);
+      console.log('Server response:', error.response);
+
+      toast({
+        title: "Error",
+        description: "An error occurred while creating the list.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+
+  return (
+    <Flex
+      mt={8}
+      justify="center"
+      align="center"
+      direction="column"
+      p={4}
+      border="1px solid teal"
+      borderRadius="md"
+      maxW="800px"
+      width="55%"
+    >
+      <Text fontSize="xl" fontWeight="bold" mb={4}>
+        Create a List 📋
+      </Text>
+
+      <Input
+        name="name"
+        placeholder="Enter List Name..."
+        value={listParams.name}
+        onChange={handleInputChange}
+        width={["100%", "100%", "100%", "50%"]}
+        mb={4}
+      />
+
+      {/* Remove the created_by input field */}
+      {/* The created_by field is automatically set based on the logged-in user */}
+
+      <Input
+        name="description"
+        placeholder="Enter List Description..."
+        value={listParams.description}
+        width={["100%", "100%", "100%", "50%"]}
+        onChange={handleInputChange}
+       
+        mb={4}
+      />
+
+      <Button colorScheme="teal" mt={4} onClick={handleCreateList}>
+        Create List
+      </Button>
+
+      {/* Display success message if the list is created */}
+      {listCreated && (
+        <Flex mt={4} p={4} border="1px solid teal" borderRadius="md" width="100%" direction="column">
+          <Text fontSize="md" color="green.500">
+            List created successfully!
+          </Text>
+        </Flex>
+      )}
+    </Flex>
+  );
+}
+
+function PublicLists() {
+  return (
+    <Flex
+      mt={8}
+      justify="center"
+      align="center"
+      direction="column"
+      p={4}
+      border="1px solid teal"
+      borderRadius="md"
+      maxW="800px"
+      width="55%"
+    >
+      <Text fontSize="xl" fontWeight="bold" mb={4}>
+        View Public Lists 📋
+      </Text>
+      {/* Include ViewPublicLists component here */}
+      <ViewPublicLists />
+    </Flex>
+  );
+}
+
+
+
+function ViewPublicLists() {
+  const [lists, setLists] = useState([]);
+  const [selectedList, setSelectedList] = useState(null);
+  const [listDetails, setListDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Fetch the list of all lists
+    axios
+      .get('http://localhost:4000/api/lists')
+      .then((response) => {
+        setLists(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching lists:', error);
+      });
+  }, []);
+
+  const handleViewMore = (listName) => {
+    // Set loading to true when starting to fetch details
+    setLoading(true);
+
+    // Fetch detailed information about the selected list
+    axios
+      .get(`http://localhost:4000/api/lists/${listName}`)
+      .then((response) => {
+        setListDetails(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching list details:', error);
+      });
+
+    // Fetch heroes from the selected list
+    axios
+      .get(`http://localhost:4000/api/lists/${listName}/heroes`)
+      .then((response) => {
+        setListDetails((prevDetails) => ({
+          ...prevDetails,
+          heroes: response.data,
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching list heroes:', error);
+      })
+      .finally(() => {
+        // Set loading to false after fetching is complete
+        setLoading(false);
+      });
+
+    // Set the selected list for display
+    setSelectedList(listName);
+  };
+
+  return (
+    <Flex flexDirection="column" width="100%" mb={4}>
+      <Text fontSize="xl" fontWeight="bold" mb={2}>
+        View Public Lists 📋
+      </Text>
+
+      {lists.map((listName) => (
+        <Flex key={listName} flexDirection="column" mt={4}>
+          <Text fontWeight="bold" fontSize="xl">
+            List Name: {listName}
+          </Text>
+          <Text>
+            Created by: {listDetails && listDetails.created_by}
+          </Text>
+          <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
+            {selectedList === listName ? 'Hide Details' : 'View Details'}
+          </Button>
+
+          {selectedList === listName && listDetails && !loading && (
+            <Flex flexDirection="column" mt={2}>
+              <Text>
+                <span style={{ fontWeight: 'bold' }}>Description:</span> {listDetails.description}
+              </Text>
+              <Text fontWeight="bold" mt={2}>
+                Heroes:
+              </Text>
+              {listDetails.heroes &&
+                listDetails.heroes.map((hero) => (
+                  <Flex key={hero.info.id} flexDirection="column" mt={2}>
+                    <Text>
+                      <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
+                    </Text>
+                    {/* Display other hero information as needed */}
+                  </Flex>
+                ))}
+            </Flex>
+          )}
+        </Flex>
+      ))}
+    </Flex>
+  );
+}
+
+
 
 function ColorModeWrapper({ children }) {
   return (

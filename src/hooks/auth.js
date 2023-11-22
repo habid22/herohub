@@ -2,24 +2,50 @@ import {signInWithEmailAndPassword} from 'firebase/auth';
 import {sendEmailVerification} from 'firebase/auth';
 import {useAuthState} from 'react-firebase-hooks/auth';
 import {auth, db} from '../lib/firebase';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {DASHBOARD} from '../lib/routes';
 import {useToast} from '@chakra-ui/react';
 import {useNavigate} from 'react-router-dom';
 import {LOGIN} from '../lib/routes';
 import {useSignOut} from 'react-firebase-hooks/auth';
-import {setDoc, doc} from 'firebase/firestore';
+import {setDoc, doc, getDoc} from 'firebase/firestore';
 import jwt_decode from 'jwt-decode';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
 import isUsernameExists from '../utils/isUsernameExist';
 
 
 
+
 export function useAuth() {
-    const [authUser, isLoading, error] = useAuthState(auth);
+  const [authUser, isLoading, error] = useAuthState(auth);
+  const [userData, setUserData] = useState(null); // State to store user data
 
+  // Fetch user data when authUser changes
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (authUser) {
+        try {
+          const userDocRef = doc(db, 'users', authUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
 
-    return {user: authUser, isLoading, error};
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            setUserData(userData);
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [authUser]);
+
+  // Extract the email and username separately
+  const email = authUser?.email || "";
+  const username = userData?.username || "";
+
+  return { user: { ...authUser, username }, email, isLoading, error };
 }
 
 export function useLogin() {
@@ -46,12 +72,17 @@ export function useLogin() {
         setLoading(false);
         return false; // Return false if login failed due to unverified email
       }
+
+      // Access the username and print it
+      const username = await fetchUsername(userCredential.user.uid);
+      console.log('Logged in as:', username);
+
       // Get JWT token
       const idToken = await userCredential.user.getIdToken();
       console.log('JWT Token:', idToken);
+
       // Store JWT token in local storage
       localStorage.setItem('token', idToken);
-
 
       toast({
         title: 'You are logged in',
@@ -77,6 +108,24 @@ export function useLogin() {
     }
 
     return true; // Return true if login success
+  }
+
+  // Function to fetch the username from Firestore
+  async function fetchUsername(uid) {
+    try {
+      const userDocRef = doc(db, 'users', uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        return userData.username;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching username:', error);
+      return null;
+    }
   }
 
   return { login, isLoading };
