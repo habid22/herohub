@@ -324,6 +324,11 @@ function SuperheroItem({ superhero }) {
   );
 }
 
+//things to implement: 
+//1. date modified section
+//2. list management: start with displaying lists created by the logged in user
+//3. public and private options for lists set by the user who created the list
+
 
 function CreateList() {
   const { user } = useAuth();
