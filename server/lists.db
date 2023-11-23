@@ -1,16 +1,34 @@
 {
   "MyNewList": {
-    "data": [1,2,3,4],
+    "data": [
+      1,
+      2,
+      3,
+      4
+    ],
     "created_by": "User123"
   },
   "hassan": {
-    "data": [2,4,5],
+    "data": [
+      2,
+      4,
+      5
+    ],
     "created_by": "hs27",
     "description": "This is a new list for testing."
   },
   "CanYouSeeThis": {
-    "data": [1,5,4],
+    "data": [
+      1,
+      5,
+      4
+    ],
     "created_by": "habid22",
     "description": "Hey, this is my first list!"
+  },
+  "Star Wars": {
+    "data": [],
+    "created_by": "hassanabidamin",
+    "description": "This will be list of Star Wars characters"
   }
 }
