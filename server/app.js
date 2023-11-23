@@ -338,8 +338,8 @@ app.post('/api/lists', (req, res) => {
   const { name, created_by, description } = req.body;
 
   // Validate input
-  if (!name || !created_by || !description) {
-    return res.status(400).json({ error: 'List name, created_by, and description are required' });
+  if (!name || !created_by) {
+    return res.status(400).json({ error: 'List name and created_by are required' });
   }
 
   // Sanitize input for lists
@@ -363,11 +363,28 @@ app.post('/api/lists', (req, res) => {
   lists[sanitizedListName] = {
     data: [],
     created_by,
-    description,
+    description: description || '', // Optional description, default to an empty string
   };
   writeListsToFile(lists);
 
   res.status(201).json({ message: `List ${sanitizedListName} created successfully` });
+});
+
+// 6. Endpoint responsible for updating an existing list (USED BY ADD HERO TO LIST)
+app.put('/api/lists/:name', (req, res) => {
+  const { name } = req.params;
+  const lists = readListsFromFile();
+  if (!lists[name]) {
+    return res.status(404).send('List name does not exist');
+  }
+  const newSuperheroIds = req.body.superheroIds;
+  if (!Array.isArray(newSuperheroIds) || !newSuperheroIds.every(isValidId)) {
+    return res.status(400).send('Invalid superhero IDs format');
+  }
+
+  lists[name].data = [...new Set([...lists[name].data, ...newSuperheroIds])];
+  writeListsToFile(lists);
+  res.send(`List ${name} updated successfully`);
 });
 
 //  Endpoint responsible for getting a list content (USED BY DISPLAY LIST CONTENT)

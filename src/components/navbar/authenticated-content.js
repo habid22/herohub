@@ -451,7 +451,7 @@ function PublicLists() {
       width="55%"
     >
       <Text fontSize="xl" fontWeight="bold" mb={4}>
-        Public Hero Lists 🦸
+        Public Hero Lists 🌎
       </Text>
       {/* Include ViewPublicLists component here */}
       <ViewPublicLists />
@@ -551,10 +551,6 @@ function ViewPublicLists() {
 
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
-      <Text fontSize="xl" fontWeight="bold" mb={2}>
-        View Public Lists 📋
-      </Text>
-
       {lists.map((listName) => (
         <Flex key={listName} flexDirection="column" mt={4}>
           <Text fontWeight="bold" fontSize="xl">
@@ -567,16 +563,17 @@ function ViewPublicLists() {
           <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
             {selectedList === listName ? 'Hide Details' : 'View Details'}
           </Button>
-
+  
           {selectedList === listName && listDetails[listName] && !detailsLoading && (
             <Flex flexDirection="column" mt={2}>
+              <Text fontWeight="bold" mt={2} textAlign="center" fontSize="lg">
+                List Details
+              </Text>
               <Text>
                 <span style={{ fontWeight: 'bold' }}>Description:</span>{' '}
                 {listDetails[listName].description}
               </Text>
-              <Text fontWeight="bold" mt={2} textAlign="center" fontSize="lg">
-                List Details
-              </Text>
+              <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
               {listDetails[listName].heroes &&
               listDetails[listName].heroes.map((hero) => (
                 <Flex key={hero.info.id} flexDirection="column" mt={2}>
@@ -584,7 +581,7 @@ function ViewPublicLists() {
                     <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
                   </Text>
                   <Text>
-                    <span style={{ fontWeight: 'bold' }}>Publisher:</span> {hero.info.publisher}
+                    <span style={{ fontWeight: 'bold' }}>Publisher:</span> {hero.info.Publisher}
                   </Text>
                   <Text>
                     <span style={{ fontWeight: 'bold' }}>Powers:</span> {hero.info.powers.join(', ')}
@@ -597,16 +594,10 @@ function ViewPublicLists() {
           )}
         </Flex>
       ))}
-
-      {/* Place the "Hide Details" button outside the loop
-      {selectedList !== null && !detailsLoading && (
-        <Button size="sm" onClick={handleHideDetails} mt={2}>
-          Hide Details
-        </Button>
-      )} */}
     </Flex>
   );
 }
+  
 
 
 
