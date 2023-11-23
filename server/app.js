@@ -360,34 +360,45 @@ app.post('/api/lists', (req, res) => {
   }
 
   // Create the list and write it to the file
+  const currentDate = new Date().toISOString().split('T')[0]; // Get the current date in ISO format and extract the date part
   lists[sanitizedListName] = {
     data: [],
     created_by,
     description: description || '', // Optional description, default to an empty string
+    date_modified: currentDate, // Add the date_modified field
   };
+
   writeListsToFile(lists);
 
   res.status(201).json({ message: `List ${sanitizedListName} created successfully` });
 });
 
-// 6. Endpoint responsible for updating an existing list (USED BY ADD HERO TO LIST)
+
+
+// Endpoint responsible for updating an existing list (USED BY ADD HERO TO LIST)
 app.put('/api/lists/:name', (req, res) => {
   const { name } = req.params;
   const lists = readListsFromFile();
+
   if (!lists[name]) {
     return res.status(404).send('List name does not exist');
   }
+
   const newSuperheroIds = req.body.superheroIds;
+
   if (!Array.isArray(newSuperheroIds) || !newSuperheroIds.every(isValidId)) {
     return res.status(400).send('Invalid superhero IDs format');
   }
 
+  // Update the list and set the date_modified field
   lists[name].data = [...new Set([...lists[name].data, ...newSuperheroIds])];
+  lists[name].date_modified = new Date().toISOString().split('T')[0]; // Update the date_modified field
   writeListsToFile(lists);
+
   res.send(`List ${name} updated successfully`);
 });
 
-//  Endpoint responsible for getting a list content (USED BY DISPLAY LIST CONTENT)
+// Endpoint responsible for getting a list content (USED BY DISPLAY LIST CONTENT)
 app.get('/api/lists/:name', (req, res) => {
   const { name } = req.params;
   const lists = readListsFromFile();
@@ -400,6 +411,7 @@ app.get('/api/lists/:name', (req, res) => {
     created_by: lists[name].created_by,
     description: lists[name].description,
     data: lists[name].data,
+    date_modified: lists[name].date_modified, // Include the date_modified field in the response
   });
 });
 
@@ -435,6 +447,37 @@ app.get('/api/lists/:name/heroes', (req, res) => {
   });
 
   res.json(heroes);
+});
+
+
+// Endpoint to get the date_modified for a specific list
+app.get('/api/lists/:name/date_modified', (req, res) => {
+  const { name } = req.params;
+  const lists = readListsFromFile();
+
+  if (!lists[name]) {
+    return res.status(404).send('List not found');
+  }
+
+  res.json({
+    name,
+    date_modified: lists[name].date_modified,
+  });
+});
+
+// Endpoint to get the created_by for a specific list
+app.get('/api/lists/:name/created_by', (req, res) => {
+  const { name } = req.params;
+  const lists = readListsFromFile();
+
+  if (!lists[name]) {
+    return res.status(404).send('List not found');
+  }
+
+  res.json({
+    name,
+    created_by: lists[name].created_by,
+  });
 });
 
 // Endpoint to get a list of all lists (USED BY VIEWLISTS)

@@ -469,18 +469,51 @@ function PublicLists() {
 function ViewPublicLists() {
   const [lists, setLists] = useState([]);
   const [selectedList, setSelectedList] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [listDetails, setListDetails] = useState({});
   const [detailsLoading, setDetailsLoading] = useState(false);
 
+  const fetchDateModified = (listName) => {
+    axios
+      .get(`http://localhost:4000/api/lists/${listName}/date_modified`)
+      .then((dateModifiedResponse) => {
+        setListDetails((prevDetails) => ({
+          ...prevDetails,
+          [listName]: {
+            ...prevDetails[listName],
+            date_modified: dateModifiedResponse.data.date_modified,
+          },
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching date_modified:', error);
+      });
+  };
+
+  const fetchCreatedBy = (listName) => {
+    axios
+      .get(`http://localhost:4000/api/lists/${listName}/created_by`)
+      .then((createdByResponse) => {
+        setListDetails((prevDetails) => ({
+          ...prevDetails,
+          [listName]: {
+            ...prevDetails[listName],
+            created_by: createdByResponse.data.created_by,
+          },
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching created_by:', error);
+      });
+  };
+
   useEffect(() => {
-    // Fetch the list of all lists and their details
+    // Fetch the list of all lists
     axios
       .get('http://localhost:4000/api/lists')
       .then((response) => {
         setLists(response.data);
 
-        // Fetch detailed information for each list
+        // Fetch detailed information for each list immediately after fetching the list names
         const detailRequests = response.data.map((listName) =>
           axios.get(`http://localhost:4000/api/lists/${listName}`)
         );
@@ -501,6 +534,20 @@ function ViewPublicLists() {
         console.error('Error fetching lists:', error);
       });
   }, []);
+
+  // Fetch date_modified independently when lists change
+  useEffect(() => {
+    lists.forEach((listName) => {
+      fetchDateModified(listName);
+    });
+  }, [lists]);
+
+  // Fetch created_by independently when lists change
+  useEffect(() => {
+    lists.forEach((listName) => {
+      fetchCreatedBy(listName);
+    });
+  }, [lists]);
 
   const handleViewMore = (listName) => {
     // Set details loading to true when starting to fetch details
@@ -561,14 +608,17 @@ function ViewPublicLists() {
           <Text fontWeight="bold" fontSize="xl">
             List Name: {listName}
           </Text>
-          {/* Display Created by information if available */}
+          {/* Display Created by and Date Modified information if available */}
           <Text>
             Created by: {listDetails[listName]?.created_by || 'Not available'}
+          </Text>
+          <Text>
+            Date Modified: {listDetails[listName]?.date_modified || 'Not available'}
           </Text>
           <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
             {selectedList === listName ? 'Hide Details' : 'View Details'}
           </Button>
-  
+
           {selectedList === listName && listDetails[listName] && !detailsLoading && (
             <Flex flexDirection="column" mt={2}>
               <Text fontWeight="bold" mt={2} textAlign="center" fontSize="lg">
@@ -580,21 +630,23 @@ function ViewPublicLists() {
               </Text>
               <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
               {listDetails[listName].heroes &&
-              listDetails[listName].heroes.map((hero) => (
-                <Flex key={hero.info.id} flexDirection="column" mt={2}>
-                  <Text>
-                    <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
-                  </Text>
-                  <Text>
-                    <span style={{ fontWeight: 'bold' }}>Publisher:</span> {hero.info.Publisher}
-                  </Text>
-                  <Text>
-                    <span style={{ fontWeight: 'bold' }}>Powers:</span> {hero.info.powers.join(', ')}
-                  </Text>
-                  {/* Display other hero information as needed */}
-                  <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
-                </Flex>
-              ))}
+                listDetails[listName].heroes.map((hero) => (
+                  <Flex key={hero.info.id} flexDirection="column" mt={2}>
+                    <Text>
+                      <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
+                    </Text>
+                    <Text>
+                      <span style={{ fontWeight: 'bold' }}>Publisher:</span>{' '}
+                      {hero.info.Publisher}
+                    </Text>
+                    <Text>
+                      <span style={{ fontWeight: 'bold' }}>Powers:</span>{' '}
+                      {hero.info.powers.join(', ')}
+                    </Text>
+                    {/* Display other hero information as needed */}
+                    <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
+                  </Flex>
+                ))}
             </Flex>
           )}
         </Flex>
@@ -602,6 +654,7 @@ function ViewPublicLists() {
     </Flex>
   );
 }
+
   
 
 
