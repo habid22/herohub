@@ -456,6 +456,7 @@ function ListManagement() {
       </Text>
       <MyCurrentLists />
       <AddToList />
+      <DeleteFromList />
     </Flex>
   );
 }
@@ -540,6 +541,92 @@ function AddToList() {
       />
       <Button colorScheme="teal" mt={4} onClick={handleAddHeroToList}>
         Add Hero to List
+      </Button>
+    </Flex>
+  );
+}
+
+
+function DeleteFromList() {
+  const [userLists, setUserLists] = useState([]);
+  const [selectedList, setSelectedList] = useState("");
+  const [heroName, setHeroName] = useState(""); // Changed heroId to heroName
+  const toast = useToast();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Fetch the user's lists when the component mounts
+    const fetchUserLists = async () => {
+      try {
+        const response = await axios.get(`http://localhost:4000/api/lists/created_by/${user.username}`);
+        setUserLists(response.data);
+      } catch (error) {
+        console.error("Error fetching user lists:", error);
+      }
+    };
+
+    // Assuming you have access to the user object (you mentioned it in the existing code)
+    fetchUserLists();
+  }, [user]);
+
+  const handleDeleteHeroFromList = async () => {
+    try {
+      // Ensure both list and heroName are selected
+      if (!selectedList || !heroName) {
+        toast({
+          title: "Error",
+          description: "Please select a list and enter a valid Hero Name.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // Send a DELETE request to remove the hero from the selected list
+      const response = await axios.delete(
+        `http://localhost:4000/api/lists/${encodeURIComponent(selectedList)}/heroes/${encodeURIComponent(heroName)}`
+      );
+
+      toast({
+        title: "Success",
+        description: response.data,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error deleting hero from list:", error);
+      toast({
+        title: "Error",
+        description: "Error deleting hero from list. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  return (
+    <Flex flexDirection="column" mt={8}>
+      <Text fontSize="xl" fontWeight="bold" mb={4} textAlign="center">
+        Delete Hero from a List 🗑️
+      </Text>
+      <Select placeholder="Select a List" value={selectedList} onChange={(e) => setSelectedList(e.target.value)}>
+        {userLists.map((listName) => (
+          <option key={listName} value={listName}>
+            {listName}
+          </option>
+        ))}
+      </Select>
+      <Input
+        placeholder="Enter Superhero Name"
+        value={heroName}
+        onChange={(e) => setHeroName(e.target.value)}
+        mt={2}
+      />
+      <Button colorScheme="teal" mt={4} onClick={handleDeleteHeroFromList}>
+        Delete Hero from List
       </Button>
     </Flex>
   );

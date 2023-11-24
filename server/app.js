@@ -496,6 +496,39 @@ app.get('/api/lists', (req, res) => {
   res.json(Object.keys(lists));
 });
 
+// Endpoint to delete a superhero from a specific list by hero name
+app.delete('/api/lists/:listName/heroes/:heroName', (req, res) => {
+  const { listName, heroName } = req.params;
+  const lists = readListsFromFile();
+
+  if (!lists[listName]) {
+    return res.status(404).send('List not found');
+  }
+
+  const list = lists[listName];
+
+  // Check if the hero exists in the list
+  const heroIndex = list.data.findIndex(id => {
+    const info = getSuperheroInfoById(id);
+    return info && info.name === heroName;
+  });
+
+  if (heroIndex === -1) {
+    return res.status(404).send(`Superhero ${heroName} not found in the list`);
+  }
+
+  // Remove the superhero from the list
+  list.data.splice(heroIndex, 1);
+
+  // Update the date_modified field
+  list.date_modified = new Date().toISOString().split('T')[0];
+
+  // Write the updated lists to the file
+  writeListsToFile(lists);
+
+  res.send(`Superhero ${heroName} deleted from the list ${listName} successfully`);
+});
+
 
 
 
