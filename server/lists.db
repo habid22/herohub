@@ -59,13 +59,12 @@
     "description": "This list will contain heroes from marvel",
     "date_modified": "2023-11-24"
   },
-  "TestList2": {
+  "TestList": {
     "data": [
-      57,
       69
     ],
     "created_by": "habid22",
-    "description": "sample list",
+    "description": "This is  a test list...",
     "date_modified": "2023-11-24"
   }
 }
