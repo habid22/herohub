@@ -22,6 +22,10 @@ import { FaSuperpowers } from "react-icons/fa";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import axios from "axios";
 
+// things to implement for lists
+// 1. ability to update a description for a list
+// 2. add privacy options to lists
+// 3. sort public lists by date modified
 
 
 
@@ -330,10 +334,7 @@ function SuperheroItem({ superhero }) {
   );
 }
 
-//things to implement: 
-//1. date modified section
-//2. list management: start with displaying lists created by the logged in user
-//3. public and private options for lists set by the user who created the list
+
 
 
 function CreateList() {
