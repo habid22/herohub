@@ -57,5 +57,14 @@
     "created_by": "habid22",
     "description": "sample list",
     "date_modified": "2023-11-24"
+  },
+  "Marvel Heroes": {
+    "data": [
+      71,
+      422
+    ],
+    "created_by": "habid22",
+    "description": "This list will contain heroes from marvel",
+    "date_modified": "2023-11-24"
   }
 }
