@@ -34,7 +34,8 @@
   },
   "Star Wars": {
     "data": [
-      67
+      67,
+      126
     ],
     "created_by": "hassanabidamin",
     "description": "This will be list of Star Wars characters",
@@ -49,13 +50,12 @@
     "description": "This is a Date Test",
     "date_modified": "2023-11-24"
   },
-  "TestList": {
+  "TestListAgain": {
     "data": [
-      69,
-      54
+      89
     ],
     "created_by": "habid22",
-    "description": "I created this for testing purposes...",
+    "description": "sample list",
     "date_modified": "2023-11-24"
   }
 }

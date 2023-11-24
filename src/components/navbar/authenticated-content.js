@@ -720,6 +720,7 @@ function MyCurrentLists() {
                       <Text>
                         <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
                       </Text>
+                  
                       <Text>
                         <span style={{ fontWeight: 'bold' }}>Publisher:</span>{' '}
                         {hero.info.Publisher}
