@@ -480,6 +480,16 @@ app.get('/api/lists/:name/created_by', (req, res) => {
   });
 });
 
+// Endpoint to get list names based on created_by
+app.get('/api/lists/created_by/:username', (req, res) => {
+  const { username } = req.params;
+  const lists = readListsFromFile();
+
+  const userLists = Object.keys(lists).filter((listName) => lists[listName].created_by === username);
+
+  res.json(userLists);
+});
+
 // Endpoint to get a list of all lists (USED BY VIEWLISTS)
 app.get('/api/lists', (req, res) => {
   const lists = readListsFromFile();

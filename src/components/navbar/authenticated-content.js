@@ -15,6 +15,7 @@ import {
   useToast,
   Divider,
   Checkbox,
+  Select,
 } from "@chakra-ui/react";
 import { useLogout, useAuth } from "../../hooks/auth"; // Import useAuth
 import { FaSuperpowers } from "react-icons/fa";
@@ -35,6 +36,7 @@ export default function LogInContent() {
       <WelcomeContainer />
       <HeroSearchContainer />
       <CreateList />
+      <ListManagement />
       <PublicLists />
     </Flex>
     </ColorModeWrapper>
@@ -292,6 +294,10 @@ function SuperheroItem({ superhero }) {
       {showDetails && (
         <Flex flexDirection="column" mt={2}>
           <Text>
+        <span style={{ fontWeight: 'bold' }}>Superhero Number:</span> {superhero.id}
+      </Text>
+
+          <Text>
             <span style={{ fontWeight: 'bold' }}>Gender:</span> {superhero.Gender}
           </Text>
           <Text>
@@ -441,6 +447,302 @@ function CreateList() {
     </Flex>
   );
 }
+
+function ListManagement() {
+  return (
+    <Flex mt={8} justify="center" align="center" direction="column" p={4} border="1px solid teal" borderRadius="md" maxW="800px" width="55%">
+      <Text fontSize="xl" fontWeight="bold" mb={4}>
+        Your Lists 📋
+      </Text>
+      <MyCurrentLists />
+      <AddToList />
+    </Flex>
+  );
+}
+
+function AddToList() {
+  const [userLists, setUserLists] = useState([]);
+  const [selectedList, setSelectedList] = useState("");
+  const [heroId, setHeroId] = useState("");
+  const toast = useToast();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Fetch the user's lists when the component mounts
+    const fetchUserLists = async () => {
+      try {
+        const response = await axios.get(`http://localhost:4000/api/lists/created_by/${user.username}`);
+        setUserLists(response.data);
+      } catch (error) {
+        console.error("Error fetching user lists:", error);
+      }
+    };
+
+    // Assuming you have access to the user object (you mentioned it in the existing code)
+    fetchUserLists();
+  }, [user]);
+
+  const handleAddHeroToList = async () => {
+    try {
+      // Ensure both list and heroId are selected
+      if (!selectedList || !heroId) {
+        toast({
+          title: "Error",
+          description: "Please select a list and enter a valid Hero ID.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // Send a PUT request to add the hero to the selected list
+      const response = await axios.put(`http://localhost:4000/api/lists/${encodeURIComponent(selectedList)}`, {
+        superheroIds: [parseInt(heroId, 10)], // Ensure heroId is parsed as an integer
+      });
+
+      toast({
+        title: "Success",
+        description: response.data,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error adding hero to list:", error);
+      toast({
+        title: "Error",
+        description: "Error adding hero to list. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  return (
+    <Flex flexDirection="column" mt={8}>
+      <Text fontSize="xl" fontWeight="bold" mb={4} textAlign="center">
+        Add Hero to a List 🦸‍♂️
+      </Text>
+      <Select placeholder="Select a List" value={selectedList} onChange={(e) => setSelectedList(e.target.value)}>
+        {userLists.map((listName) => (
+          <option key={listName} value={listName}>
+            {listName}
+          </option>
+        ))}
+      </Select>
+      <Input
+        placeholder="Enter Superhero Number"
+        value={heroId}
+        onChange={(e) => setHeroId(e.target.value)}
+        mt={2}
+      />
+      <Button colorScheme="teal" mt={4} onClick={handleAddHeroToList}>
+        Add Hero to List
+      </Button>
+    </Flex>
+  );
+}
+
+
+
+
+function MyCurrentLists() {
+  const { user } = useAuth();
+  const [userLists, setUserLists] = useState([]);
+  const [selectedList, setSelectedList] = useState(null);
+  const [listDetails, setListDetails] = useState({});
+  const [detailsLoading, setDetailsLoading] = useState(false);
+
+  const fetchDateModified = (listName) => {
+    axios
+      .get(`http://localhost:4000/api/lists/${listName}/date_modified`)
+      .then((dateModifiedResponse) => {
+        setListDetails((prevDetails) => ({
+          ...prevDetails,
+          [listName]: {
+            ...prevDetails[listName],
+            date_modified: dateModifiedResponse.data.date_modified,
+          },
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching date_modified:', error);
+      });
+  };
+
+  const fetchCreatedBy = (listName) => {
+    axios
+      .get(`http://localhost:4000/api/lists/${listName}/created_by`)
+      .then((createdByResponse) => {
+        setListDetails((prevDetails) => ({
+          ...prevDetails,
+          [listName]: {
+            ...prevDetails[listName],
+            created_by: createdByResponse.data.created_by,
+          },
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching created_by:', error);
+      });
+  };
+
+  const fetchHeroes = (listName) => {
+    axios
+      .get(`http://localhost:4000/api/lists/${listName}/heroes`)
+      .then((heroesResponse) => {
+        setListDetails((prevDetails) => ({
+          ...prevDetails,
+          [listName]: {
+            ...prevDetails[listName],
+            heroes: heroesResponse.data,
+          },
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching list heroes:', error);
+      });
+  };
+
+  useEffect(() => {
+    const fetchUserLists = async () => {
+      try {
+        const response = await axios.get(`http://localhost:4000/api/lists/created_by/${user.username}`);
+        setUserLists(response.data);
+      } catch (error) {
+        console.error("Error fetching user lists:", error);
+      }
+    };
+
+    if (user) {
+      fetchUserLists();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    // Fetch date_modified independently when userLists change
+    userLists.forEach((listName) => {
+      fetchDateModified(listName);
+    });
+
+    // Fetch created_by independently when userLists change
+    userLists.forEach((listName) => {
+      fetchCreatedBy(listName);
+    });
+  }, [userLists]);
+
+  const handleViewMore = (listName) => {
+    // Set details loading to true when starting to fetch details
+    setDetailsLoading(true);
+
+    // If the selected list is the same as the one being displayed, hide details
+    if (selectedList === listName) {
+      setSelectedList(null);
+      setDetailsLoading(false); // Set details loading to false when hiding details
+    } else {
+      // Set the selected list for display
+      setSelectedList(listName);
+
+      // Fetch detailed information about the selected list
+      axios
+        .get(`http://localhost:4000/api/lists/${listName}`)
+        .then((response) => {
+          setListDetails((prevDetails) => ({
+            ...prevDetails,
+            [listName]: response.data,
+          }));
+        })
+        .catch((error) => {
+          console.error('Error fetching list details:', error);
+        })
+        .finally(() => {
+          // Set details loading to false after fetching is complete
+          setDetailsLoading(false);
+        });
+
+      // Fetch heroes from the selected list
+      fetchHeroes(listName);
+    }
+  };
+
+  const handleHideDetails = () => {
+    setSelectedList(null);
+  };
+
+  const handleDeleteList = async (listName) => {
+    try {
+      await axios.delete(`http://localhost:4000/api/lists/${listName}`);
+      // After successfully deleting the list, update the userLists state
+      setUserLists((prevUserLists) => prevUserLists.filter((name) => name !== listName));
+    } catch (error) {
+      console.error(`Error deleting list ${listName}:`, error);
+    }
+  };
+
+  return (
+    <Flex flexDirection="column" width="100%" mb={4}>
+      {userLists.map((listName) => (
+        <Flex key={listName} flexDirection="column" mt={4}>
+          <Text fontWeight="bold" fontSize="xl">
+            List Name: {listName}
+          </Text>
+          {/* Display Created by and Date Modified information if available */}
+          <Text>
+            Created by: {listDetails[listName]?.created_by || 'Not available'}
+          </Text>
+          <Text>
+            Date Modified: {listDetails[listName]?.date_modified || 'Not available'}
+          </Text>
+          <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
+            {selectedList === listName ? 'Hide Details' : 'View Details'}
+          </Button>
+          <Button size="sm" onClick={() => handleDeleteList(listName)} mt={2}>
+            Delete
+          </Button>
+
+          {selectedList === listName && listDetails[listName] && !detailsLoading && (
+            <Flex flexDirection="column" mt={2}>
+              <Text fontWeight="bold" mt={2} textAlign="center" fontSize="lg">
+                List Details
+              </Text>
+              <Text>
+                <span style={{ fontWeight: 'bold' }}>Description:</span>{' '}
+                {listDetails[listName].description}
+              </Text>
+              
+              {listDetails[listName].heroes && (
+                <>
+                  
+                  {listDetails[listName].heroes.map((hero) => (
+                    <Flex key={hero.info.id} flexDirection="column" mt={2}>
+                      <Text>
+                        <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
+                      </Text>
+                      <Text>
+                        <span style={{ fontWeight: 'bold' }}>Publisher:</span>{' '}
+                        {hero.info.Publisher}
+                      </Text>
+                      <Text>
+                        <span style={{ fontWeight: 'bold' }}>Powers:</span>{' '}
+                        {hero.info.powers.join(', ')}
+                      </Text>
+                      {/* Display other hero information as needed */}
+                      <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
+                    </Flex>
+                  ))}
+                </>
+              )}
+            </Flex>
+          )}
+        </Flex>
+      ))}
+    </Flex>
+  );
+}
+
+
 
 function PublicLists() {
   return (
