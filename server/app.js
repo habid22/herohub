@@ -530,6 +530,27 @@ app.delete('/api/lists/:listName/heroes/:heroName', (req, res) => {
 });
 
 
+// Endpoint to update the description for a specific list by name
+app.patch('/api/lists/:name/description', (req, res) => {
+  const { name } = req.params;
+  const { description } = req.body;
+
+  const lists = readListsFromFile();
+
+  if (!lists[name]) {
+    return res.status(404).send('List not found');
+  }
+
+  // Update the description and set the date_modified field
+  lists[name].description = description;
+  lists[name].date_modified = new Date().toISOString().split('T')[0];
+
+  // Write the updated lists to the file
+  writeListsToFile(lists);
+
+  res.send(`Description for the list ${name} updated successfully`);
+});
+
 
 
 

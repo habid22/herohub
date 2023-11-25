@@ -16,8 +16,8 @@
       5
     ],
     "created_by": "hs27",
-    "description": "This is a new list for testing.",
-    "date_modified": "2023-10-23"
+    "description": "Updated description for the sample list",
+    "date_modified": "2023-11-24"
   },
   "CanYouSeeThis": {
     "data": [
@@ -47,7 +47,7 @@
       69
     ],
     "created_by": "habid22",
-    "description": "This is a Date Test",
+    "description": "hiii",
     "date_modified": "2023-11-24"
   },
   "Marvel Heroes": {
@@ -61,10 +61,10 @@
   },
   "TestList": {
     "data": [
-      69
+      56
     ],
     "created_by": "habid22",
-    "description": "sample list",
-    "date_modified": "2023-11-24"
+    "description": "I just updated this using the list function!",
+    "date_modified": "2023-11-25"
   }
 }

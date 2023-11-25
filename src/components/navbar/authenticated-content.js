@@ -457,6 +457,7 @@ function ListManagement() {
       </Text>
       <MyCurrentLists />
       <AddToList />
+      <UpdateDescriptionList />
       <DeleteFromList />
     </Flex>
   );
@@ -546,6 +547,97 @@ function AddToList() {
     </Flex>
   );
 }
+
+
+
+function UpdateDescriptionList() {
+  const [userLists, setUserLists] = useState([]);
+  const [selectedList, setSelectedList] = useState("");
+  const [newDescription, setNewDescription] = useState("")
+  const toast = useToast();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Fetch the user's lists when the component mounts
+    const fetchUserLists = async () => {
+      try {
+        const response = await axios.get(`http://localhost:4000/api/lists/created_by/${user.username}`);
+        setUserLists(response.data);
+      } catch (error) {
+        console.error("Error fetching user lists:", error);
+      }
+    };
+
+    // Assuming you have access to the user object (you mentioned it in the existing code)
+    fetchUserLists();
+  }, [user]);
+
+  const handleUpdateDescription = async () => {
+    try {
+      // Ensure both list and newDescription are selected
+      if (!selectedList || !newDescription) {
+        toast({
+          title: "Error",
+          description: "Please select a list and enter a valid description.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // Send a PATCH request to update the list description
+      const response = await axios.patch(
+        `http://localhost:4000/api/lists/${encodeURIComponent(selectedList)}/description`,
+        {
+          description: newDescription,
+        }
+      );
+
+      toast({
+        title: "Success",
+        description: response.data,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error updating list description:", error);
+      toast({
+        title: "Error",
+        description: "Error updating list description. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  return (
+    <Flex flexDirection="column" mt={8}>
+      <Text fontSize="xl" fontWeight="bold" mb={4} textAlign="center">
+        Update List Description 📋
+      </Text>
+      <Select placeholder="Select a List" value={selectedList} onChange={(e) => setSelectedList(e.target.value)}>
+        {userLists.map((listName) => (
+          <option key={listName} value={listName}>
+            {listName}
+          </option>
+        ))}
+      </Select>
+      <Input
+        placeholder="Enter New Description"
+        value={newDescription}
+        onChange={(e) => setNewDescription(e.target.value)} // Update state when the input changes
+        mt={2}
+      />
+      <Button colorScheme="teal" mt={4} onClick={handleUpdateDescription}>
+        Update Description
+      </Button>
+    </Flex>
+  );
+}
+
 
 
 function DeleteFromList() {
