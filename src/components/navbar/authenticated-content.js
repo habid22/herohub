@@ -1032,6 +1032,11 @@ function ViewPublicLists() {
     });
   }, [lists]);
 
+  // Sort the lists based on date_modified in descending order
+  const sortedLists = [...lists].sort(
+    (a, b) => new Date(listDetails[b]?.date_modified) - new Date(listDetails[a]?.date_modified)
+  );
+
   const handleViewMore = (listName) => {
     // Set details loading to true when starting to fetch details
     setDetailsLoading(true);
@@ -1086,7 +1091,7 @@ function ViewPublicLists() {
 
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
-      {lists.map((listName) => (
+      {sortedLists.map((listName) => (
         <Flex key={listName} flexDirection="column" mt={4}>
           <Text fontWeight="bold" fontSize="xl">
             List Name: {listName}
