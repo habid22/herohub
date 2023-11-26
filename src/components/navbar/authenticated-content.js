@@ -878,6 +878,10 @@ function MyCurrentLists() {
           <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
             {selectedList === listName ? 'Hide Details' : 'View Details'}
           </Button>
+
+          <Button size="sm"  mt={2}>
+            Make Private
+          </Button>
           <Button size="sm" onClick={() => handleDeleteList(listName)} mt={2}>
             Delete
           </Button>
