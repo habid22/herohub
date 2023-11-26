@@ -551,6 +551,47 @@ app.patch('/api/lists/:name/description', (req, res) => {
   res.send(`Description for the list ${name} updated successfully`);
 });
 
+// Endpoint to get the visibility value for a specific list
+app.get('/api/lists/:name/visibility', (req, res) => {
+  const { name } = req.params;
+  const lists = readListsFromFile();
+
+  if (!lists[name]) {
+    return res.status(404).send('List not found');
+  }
+
+  const visibilityValue = lists[name].isVisible || false;
+
+  res.json({
+    name,
+    isVisible: visibilityValue,
+  });
+});
+
+
+
+// Endpoint to update the visibility value for a specific list
+app.patch('/api/lists/:name/visibility', (req, res) => {
+  const { name } = req.params;
+  const lists = readListsFromFile();
+
+  if (!lists[name]) {
+    return res.status(404).send('List not found');
+  }
+
+  // Set the isVisible property to false
+  lists[name].isVisible = false;
+
+  // Update the date_modified field
+  lists[name].date_modified = new Date().toISOString().split('T')[0];
+
+  // Write the updated lists to the file
+  writeListsToFile(lists);
+
+  res.send(`Visibility for the list ${name} set to false successfully`);
+});
+
+
 
 
 
