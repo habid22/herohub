@@ -994,66 +994,65 @@ function ViewPublicLists() {
   };
 
   useEffect(() => {
-    // Fetch the list of all lists
-    axios
-      .get('http://localhost:4000/api/lists')
-      .then((response) => {
-        setLists(response.data);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/api/lists');
+        const visibleLists = [];
 
-        // Fetch detailed information for each list immediately after fetching the list names
-        const detailRequests = response.data.map((listName) =>
+        for (const listName of response.data) {
+          const visibilityResponse = await axios.get(`http://localhost:4000/api/lists/${listName}/visibility`);
+          if (visibilityResponse.data.isVisible) {
+            visibleLists.push(listName);
+          }
+        }
+
+        setLists(visibleLists);
+
+        const detailRequests = visibleLists.map((listName) =>
           axios.get(`http://localhost:4000/api/lists/${listName}`)
         );
 
-        Promise.all(detailRequests)
-          .then((detailResponses) => {
-            const detailsMap = {};
-            detailResponses.forEach((response, index) => {
-              detailsMap[response.data.listName] = response.data;
-            });
-            setListDetails(detailsMap);
-          })
-          .catch((error) => {
-            console.error('Error fetching list details:', error);
-          });
-      })
-      .catch((error) => {
-        console.error('Error fetching lists:', error);
-      });
+        const detailResponses = await Promise.all(detailRequests);
+
+        const detailsMap = {};
+        detailResponses.forEach((response, index) => {
+          detailsMap[response.data.listName] = response.data;
+        });
+
+        setListDetails(detailsMap);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  // Fetch date_modified independently when lists change
   useEffect(() => {
     lists.forEach((listName) => {
       fetchDateModified(listName);
     });
   }, [lists]);
 
-  // Fetch created_by independently when lists change
   useEffect(() => {
     lists.forEach((listName) => {
       fetchCreatedBy(listName);
     });
   }, [lists]);
 
-  // Sort the lists based on date_modified in descending order
   const sortedLists = [...lists].sort(
     (a, b) => new Date(listDetails[b]?.date_modified) - new Date(listDetails[a]?.date_modified)
   );
 
   const handleViewMore = (listName) => {
-    // Set details loading to true when starting to fetch details
     setDetailsLoading(true);
 
-    // If the selected list is the same as the one being displayed, hide details
     if (selectedList === listName) {
       setSelectedList(null);
-      setDetailsLoading(false); // Set details loading to false when hiding details
+      setDetailsLoading(false);
     } else {
-      // Set the selected list for display
       setSelectedList(listName);
 
-      // Fetch detailed information about the selected list
       axios
         .get(`http://localhost:4000/api/lists/${listName}`)
         .then((response) => {
@@ -1062,7 +1061,6 @@ function ViewPublicLists() {
             [listName]: response.data,
           }));
 
-          // Fetch heroes from the selected list
           axios
             .get(`http://localhost:4000/api/lists/${listName}/heroes`)
             .then((heroesResponse) => {
@@ -1078,7 +1076,6 @@ function ViewPublicLists() {
               console.error('Error fetching list heroes:', error);
             })
             .finally(() => {
-              // Set details loading to false after fetching is complete
               setDetailsLoading(false);
             });
         })
@@ -1100,7 +1097,6 @@ function ViewPublicLists() {
           <Text fontWeight="bold" fontSize="xl">
             List Name: {listName}
           </Text>
-          {/* Display Created by and Date Modified information if available */}
           <Text>
             Created by: {listDetails[listName]?.created_by || 'Not available'}
           </Text>
@@ -1135,7 +1131,6 @@ function ViewPublicLists() {
                       <span style={{ fontWeight: 'bold' }}>Powers:</span>{' '}
                       {hero.info.powers.join(', ')}
                     </Text>
-                    {/* Display other hero information as needed */}
                     <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
                   </Flex>
                 ))}

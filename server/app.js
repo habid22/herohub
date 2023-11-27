@@ -359,13 +359,14 @@ app.post('/api/lists', (req, res) => {
     return res.status(400).json({ error: 'List name already exists' });
   }
 
-  // Create the list and write it to the file
+  // Create the list and set isVisible to true
   const currentDate = new Date().toISOString().split('T')[0]; // Get the current date in ISO format and extract the date part
   lists[sanitizedListName] = {
     data: [],
     created_by,
     description: description || '', // Optional description, default to an empty string
     date_modified: currentDate, // Add the date_modified field
+    isVisible: true, // Set isVisible to true
   };
 
   writeListsToFile(lists);
@@ -551,7 +552,6 @@ app.patch('/api/lists/:name/description', (req, res) => {
   res.send(`Description for the list ${name} updated successfully`);
 });
 
-// Endpoint to get the visibility value for a specific list
 app.get('/api/lists/:name/visibility', (req, res) => {
   const { name } = req.params;
   const lists = readListsFromFile();
@@ -565,9 +565,9 @@ app.get('/api/lists/:name/visibility', (req, res) => {
   res.json({
     name,
     isVisible: visibilityValue,
+    list: lists[name], // Include the list itself in the response
   });
 });
-
 
 
 // Endpoint to update the visibility value for a specific list

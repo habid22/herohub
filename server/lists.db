@@ -8,8 +8,7 @@
     ],
     "created_by": "User123",
     "date_modified": "2023-09-23",
-    "isVisible": true
-    
+    "isVisible": false
   },
   "hassan": {
     "data": [
@@ -19,8 +18,8 @@
     ],
     "created_by": "hs27",
     "description": "Updated description for the sample list",
-    "date_modified": "2023-11-24",
-    "isVisible": true
+    "date_modified": "2023-11-26",
+    "isVisible": false
   },
   "CanYouSeeThis": {
     "data": [
@@ -34,7 +33,7 @@
     "created_by": "habid22",
     "description": "Testing Sorting",
     "date_modified": "2023-11-25",
-    "isVisible": true
+    "isVisible": false
   },
   "Star Wars": {
     "data": [
@@ -74,6 +73,15 @@
     "created_by": "habid22",
     "description": "test",
     "date_modified": "2023-11-26",
+    "isVisible": true
+  },
+  "visibilitytest": {
+    "data": [
+      69
+    ],
+    "created_by": "habid22",
+    "description": "lets go!",
+    "date_modified": "2023-11-27",
     "isVisible": true
   }
 }
