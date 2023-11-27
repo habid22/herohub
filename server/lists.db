@@ -46,16 +46,6 @@
     "date_modified": "2023-11-26",
     "isVisible": true
   },
-  "DateTest": {
-    "data": [
-      281,
-      69
-    ],
-    "created_by": "habid22",
-    "description": "hiii",
-    "date_modified": "2023-11-27",
-    "isVisible": false
-  },
   "Marvel Heroes": {
     "data": [
       71,
@@ -66,22 +56,13 @@
     "date_modified": "2023-11-27",
     "isVisible": false
   },
-  "TestList": {
+  "FunctionalityTest": {
     "data": [
-      56
+      23
     ],
     "created_by": "habid22",
-    "description": "test",
+    "description": "This is a list functionality test",
     "date_modified": "2023-11-27",
-    "isVisible": false
-  },
-  "visibilitytest": {
-    "data": [
-      69
-    ],
-    "created_by": "habid22",
-    "description": "lets go!",
-    "date_modified": "2023-11-27",
-    "isVisible": false
+    "isVisible": true
   }
 }
