@@ -786,6 +786,39 @@ function MyCurrentLists() {
       });
   };
 
+
+  const handleMakePrivate = async (listName) => {
+    try {
+      await axios.patch(`http://localhost:4000/api/lists/${listName}/visibilityFalse`, {
+        isVisible: false,
+      });
+  
+      // After successfully updating the list visibility, update the userLists state
+      setUserLists((prevUserLists) =>
+        prevUserLists.map((name) => (name === listName ? `${name} (Private)` : name))
+      );
+    } catch (error) {
+      console.error(`Error making list ${listName} private:`, error);
+    }
+    return null;
+  };
+
+  const handleMakePublic = async (listName) => {
+    try {
+      await axios.patch(`http://localhost:4000/api/lists/${listName}/visibilityTrue`, {
+        isVisible: true,
+      });
+  
+      // After successfully updating the list visibility, update the userLists state
+      setUserLists((prevUserLists) =>
+        prevUserLists.map((name) => (name === listName ? name.replace(' (Private)', '') : name))
+      );
+    } catch (error) {
+      console.error(`Error making list ${listName} public:`, error);
+    }
+    return null;
+  };
+
   useEffect(() => {
     const fetchUserLists = async () => {
       try {
@@ -879,9 +912,16 @@ function MyCurrentLists() {
             {selectedList === listName ? 'Hide Details' : 'View Details'}
           </Button>
 
-          <Button size="sm"  mt={2}>
-            Make Private
+          <Button size="sm" onClick={() => handleMakePrivate(listName)} mt={2}>
+          Make Private
           </Button>
+
+          <Button size="sm" onClick={() => handleMakePublic(listName)} mt={2}>
+          Make Public
+          </Button>
+
+
+
           <Button size="sm" onClick={() => handleDeleteList(listName)} mt={2}>
             Delete
           </Button>
