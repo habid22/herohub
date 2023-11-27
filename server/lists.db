@@ -52,7 +52,7 @@
       422
     ],
     "created_by": "habid22",
-    "description": "This list will contain heroes from marvel",
+    "description": "Test Modified",
     "date_modified": "2023-11-27",
     "isVisible": false
   },
@@ -61,8 +61,8 @@
       23
     ],
     "created_by": "habid22",
-    "description": "This is a list functionality test",
+    "description": "Test",
     "date_modified": "2023-11-27",
-    "isVisible": true
+    "isVisible": false
   }
 }
