@@ -23,12 +23,16 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Box,
 
 } from "@chakra-ui/react";
 import { useLogout, useAuth } from "../../hooks/auth"; // Import useAuth
 import { FaSuperpowers } from "react-icons/fa";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import axios from "axios";
+import { db } from "../../lib/firebase";
+import { collection, getDocs } from 'firebase/firestore';
+
 
 // things to implement for lists
 // 1. ability to update a description for a list
@@ -58,89 +62,148 @@ export default function LogInContent() {
   }
 
   function Header() {
-    const { toggleColorMode, colorMode } = useColorMode();
-    const { logout, isLoading } = useLogout();
-    const { user } = useAuth();
-    const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
-    const [isAdminModalOpen, setAdminModalOpen] = useState(false);
+  const { toggleColorMode, colorMode } = useColorMode();
+  const { logout, isLoading } = useLogout();
+  const { user } = useAuth();
+  const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
+  const [isAdminModalOpen, setAdminModalOpen] = useState(false);
+  const [usernames, setUsernames] = useState([]);
+  console.log(db)
+
+  const openAdminModal = () => {
+    setAdminModalOpen(true);
+  };
+
+  const closeAdminModal = () => {
+    setAdminModalOpen(false);
+  };
+
+  useEffect(() => {
+    if (isAdminModalOpen) {
+      // Fetch usernames from Firestore and update state
+      const fetchUsernames = async () => {
+        try {
+          // Reference the 'users' collection
+          const usersCollection = collection(db, 'users');
   
-    const openAdminModal = () => {
-      setAdminModalOpen(true);
-    };
+          // Retrieve a snapshot of the documents in the collection
+          const usersSnapshot = await getDocs(usersCollection);
   
-    const closeAdminModal = () => {
-      setAdminModalOpen(false);
-    };
+          // Map through the documents and extract the 'username' field
+          const usernamesArray = usersSnapshot.docs.map((doc) => {
+            const userData = doc.data();
+            return userData.username;
+          });
   
-    return (
-      <Flex
-        shadow="sm"
-        pos="fixed"
-        width="full"
-        borderTop="6px solid"
-        borderTopColor="teal.400"
-        height="16"
-        zIndex="3"
-        justify="space-between"
-        align="center"
-        bg={useColorModeValue("white", "gray.800")}
-        px="4"
-      >
-        <Flex align="center">
-          <Icon as={FaSuperpowers} boxSize={8} color="teal.500" />
-          <Text fontWeight="bold" fontSize="25" ml={2}>
-            HeroHub
-          </Text>
-        </Flex>
+          setUsernames(usernamesArray);
+        } catch (error) {
+          console.error("Error fetching usernames:", error);
+        }
+      };
   
-        <Flex align="center" ml="auto">
-          {isAdminUser && (
-            <Button
-              ml="2"
-              colorScheme="teal"
-              size="sm"
-              variant="outline"
-              onClick={openAdminModal}
-            >
-              Admin
-            </Button>
-          )}
-  
+      fetchUsernames();
+    }
+  }, [isAdminModalOpen]);
+
+  return (
+    <Flex
+      shadow="sm"
+      pos="fixed"
+      width="full"
+      borderTop="6px solid"
+      borderTopColor="teal.400"
+      height="16"
+      zIndex="3"
+      justify="space-between"
+      align="center"
+      bg={useColorModeValue("white", "gray.800")}
+      px="4"
+    >
+      <Flex align="center">
+        <Icon as={FaSuperpowers} boxSize={8} color="teal.500" />
+        <Text fontWeight="bold" fontSize="25" ml={2}>
+          HeroHub
+        </Text>
+      </Flex>
+
+      <Flex align="center" ml="auto">
+        {isAdminUser && (
           <Button
+            ml="2"
             colorScheme="teal"
             size="sm"
-            onClick={logout}
-            isLoading={isLoading}
-            ml="2"
+            variant="outline"
+            onClick={openAdminModal}
           >
-            Log Out
+            Admin
           </Button>
-          <Button colorScheme="teal" size="sm" ml={2} onClick={toggleColorMode}>
-            {colorMode === "light" ? <MoonIcon boxSize={4} /> : <SunIcon boxSize={4} />}
-          </Button>
-        </Flex>
-  
-        {/* Admin Modal */}
-        <Modal isOpen={isAdminModalOpen} onClose={closeAdminModal} size="full">
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Admin Panel</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              {/* Replace the following line with your desired content */}
-              <Text>Superhero Hub Users:</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="teal" onClick={closeAdminModal}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </Flex>
-    );
-  }
+        )}
 
+        <Button
+          colorScheme="teal"
+          size="sm"
+          onClick={logout}
+          isLoading={isLoading}
+          ml="2"
+        >
+          Log Out
+        </Button>
+        <Button colorScheme="teal" size="sm" ml={2} onClick={toggleColorMode}>
+          {colorMode === "light" ? <MoonIcon boxSize={4} /> : <SunIcon boxSize={4} />}
+        </Button>
+      </Flex>
+
+      {/* Admin Modal */}
+      <Modal isOpen={isAdminModalOpen} onClose={closeAdminModal} size="full">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Admin Panel</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+          <Text fontWeight="bold" fontSize="xl" textAlign="center">
+          Superhero Hub Users:
+          </Text>
+          <Text >
+          ‎
+          </Text>
+          {usernames.map((username, index) => (
+            <Box
+            key={username}
+            p={2}
+            mb={2}
+            borderRadius="md"
+            backgroundColor="teal.500"
+            color="white"
+            fontWeight="bold"
+            fontSize="lg"
+            width="30%"
+            mx="auto"
+            position="relative" // Add position relative to position the button
+          >
+            {username}
+            <Flex
+              position="absolute"
+              top="50%"
+              right="5%"
+              transform="translateY(-50%)"
+            >
+              <Button colorScheme="red" size="sm">
+                Deactivate
+              </Button>
+            </Flex>
+          </Box>
+          ))}
+        </ModalBody>
+                  <ModalFooter>
+            <Button colorScheme="teal" onClick={closeAdminModal}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </Flex>
+  );
+}
 function WelcomeContainer() {
   // Use the useAuth hook to get information about the logged-in user
   const { user } = useAuth();
