@@ -1,20 +1,16 @@
-import {signInWithEmailAndPassword} from 'firebase/auth';
-import {sendEmailVerification} from 'firebase/auth';
-import {useAuthState} from 'react-firebase-hooks/auth';
-import {auth, db} from '../lib/firebase';
-import {useState, useEffect} from 'react';
-import {DASHBOARD} from '../lib/routes';
-import {useToast} from '@chakra-ui/react';
-import {useNavigate} from 'react-router-dom';
-import {LOGIN} from '../lib/routes';
-import {useSignOut} from 'react-firebase-hooks/auth';
-import {setDoc, doc, getDoc} from 'firebase/firestore';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { sendEmailVerification } from 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, db } from '../lib/firebase';
+import { useState, useEffect } from 'react';
+import { DASHBOARD } from '../lib/routes';
+import { useToast } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { LOGIN } from '../lib/routes';
+import { useSignOut } from 'react-firebase-hooks/auth';
+import { setDoc, doc, getDoc } from 'firebase/firestore';
 import jwt_decode from 'jwt-decode';
-import {createUserWithEmailAndPassword} from 'firebase/auth';
 import isUsernameExists from '../utils/isUsernameExist';
-
-
-
 
 export function useAuth() {
   const [authUser, isLoading, error] = useAuthState(auth);
@@ -42,10 +38,14 @@ export function useAuth() {
   }, [authUser]);
 
   // Extract the email and username separately
-  const email = authUser?.email || "";
-  const username = userData?.username || "";
+  const email = authUser?.email || '';
+  const username = userData?.username || '';
 
-  return { user: { ...authUser, username }, email, isLoading, error };
+  // Check for the presence of a valid JWT token
+  const token = localStorage.getItem('token');
+  const isValidToken = token ? true : false;
+
+  return { user: { ...authUser, username }, email, isLoading, error, isValidToken };
 }
 
 export function useLogin() {
@@ -131,9 +131,6 @@ export function useLogin() {
   return { login, isLoading };
 }
 
-
-
-
 export function useRegister() {
   const [isLoading, setLoading] = useState(false);
   const toast = useToast();
@@ -196,28 +193,24 @@ export function useRegister() {
   return { register, isLoading };
 }
 
-
-
 export function useLogout() {
-    const [signOut, isLoading, error] = useSignOut(auth);
-    const toast = useToast();
-    const navigate = useNavigate();
-  
-    async function logout() {
-      
-      if (await signOut()) {
-        toast({
-          title: "Successfully logged out",
-          status: "success",
-          isClosable: true,
-          position: "top",
-          duration: 5000,
-        });
-        localStorage.removeItem('token');
-        navigate(LOGIN);
-        
-      } // else: show error [signOut() returns false if failed]
-    }
-  
-    return { logout, isLoading };
+  const [signOut, isLoading, error] = useSignOut(auth);
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  async function logout() {
+    if (await signOut()) {
+      toast({
+        title: 'Successfully logged out',
+        status: 'success',
+        isClosable: true,
+        position: 'top',
+        duration: 5000,
+      });
+      localStorage.removeItem('token');
+      navigate(LOGIN);
+    } // else: show error [signOut() returns false if failed]
   }
+
+  return { logout, isLoading };
+}
