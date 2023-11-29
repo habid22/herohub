@@ -16,6 +16,14 @@ import {
   Divider,
   Checkbox,
   Select,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+
 } from "@chakra-ui/react";
 import { useLogout, useAuth } from "../../hooks/auth"; // Import useAuth
 import { FaSuperpowers } from "react-icons/fa";
@@ -49,66 +57,89 @@ export default function LogInContent() {
 
   }
 
-function Header() {
-  const { toggleColorMode, colorMode } = useColorMode();
-  const { logout, isLoading } = useLogout();
-  const { user } = useAuth();
-
-  // Check if the current user is an admin based on their email
-  const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
-
-  return (
-    <Flex
-      shadow="sm"
-      pos="fixed"
-      width="full"
-      borderTop="6px solid"
-      borderTopColor="teal.400"
-      height="16"
-      zIndex="3"
-      justify="space-between"
-      align="center"
-      bg={useColorModeValue("white", "gray.800")}
-      px="4"
-    >
-
-    <Flex align="center">
-        <Icon as={FaSuperpowers} boxSize={8} color="teal.500" />
-        <Text fontWeight="bold" fontSize="25" ml={2}>
-          HeroHub
-        </Text>
-    </Flex>
-
-      <Flex align="center" ml="auto">
-        {/* Conditional rendering for the Admin button based on the user's email */}
-        {isAdminUser && (
+  function Header() {
+    const { toggleColorMode, colorMode } = useColorMode();
+    const { logout, isLoading } = useLogout();
+    const { user } = useAuth();
+    const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
+    const [isAdminModalOpen, setAdminModalOpen] = useState(false);
+  
+    const openAdminModal = () => {
+      setAdminModalOpen(true);
+    };
+  
+    const closeAdminModal = () => {
+      setAdminModalOpen(false);
+    };
+  
+    return (
+      <Flex
+        shadow="sm"
+        pos="fixed"
+        width="full"
+        borderTop="6px solid"
+        borderTopColor="teal.400"
+        height="16"
+        zIndex="3"
+        justify="space-between"
+        align="center"
+        bg={useColorModeValue("white", "gray.800")}
+        px="4"
+      >
+        <Flex align="center">
+          <Icon as={FaSuperpowers} boxSize={8} color="teal.500" />
+          <Text fontWeight="bold" fontSize="25" ml={2}>
+            HeroHub
+          </Text>
+        </Flex>
+  
+        <Flex align="center" ml="auto">
+          {isAdminUser && (
+            <Button
+              ml="2"
+              colorScheme="teal"
+              size="sm"
+              variant="outline"
+              onClick={openAdminModal}
+            >
+              Admin
+            </Button>
+          )}
+  
           <Button
-            ml="2"
             colorScheme="teal"
             size="sm"
-            variant="outline"
+            onClick={logout}
+            isLoading={isLoading}
+            ml="2"
           >
-            Admin
+            Log Out
           </Button>
-        )}
-
-        {/* "Log Out" button on the right with some space */}
-        <Button
-          colorScheme="teal"
-          size="sm"
-          onClick={logout}
-          isLoading={isLoading}
-          ml="2"
-        >
-          Log Out
-        </Button>
-        <Button colorScheme="teal" size="sm" ml={2} onClick={toggleColorMode}>
-          {colorMode === "light" ? <MoonIcon boxSize={4} /> : <SunIcon boxSize={4} />}
-        </Button>
+          <Button colorScheme="teal" size="sm" ml={2} onClick={toggleColorMode}>
+            {colorMode === "light" ? <MoonIcon boxSize={4} /> : <SunIcon boxSize={4} />}
+          </Button>
+        </Flex>
+  
+        {/* Admin Modal */}
+        <Modal isOpen={isAdminModalOpen} onClose={closeAdminModal} size="full">
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Admin Panel</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {/* Replace the following line with your desired content */}
+              <Text>Superhero Hub Users:</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="teal" onClick={closeAdminModal}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Flex>
-    </Flex>
-  );
-}
+    );
+  }
 
 function WelcomeContainer() {
   // Use the useAuth hook to get information about the logged-in user

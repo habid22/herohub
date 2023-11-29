@@ -34,5 +34,7 @@ export const router = createBrowserRouter([
 function ProtectedRoute() {
   const { isValidToken } = useAuth();
   console.log("Invalid token")
+
   return isValidToken ? <Layout /> : <Navigate to={LOGIN} />;
+
 }
