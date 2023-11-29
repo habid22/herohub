@@ -21,20 +21,6 @@
     "date_modified": "2023-11-26",
     "isVisible": true
   },
-  "CanYouSeeThis": {
-    "data": [
-      1,
-      5,
-      4,
-      6,
-      35,
-      62
-    ],
-    "created_by": "habid22",
-    "description": "test454",
-    "date_modified": "2023-11-29",
-    "isVisible": false
-  },
   "Star Wars": {
     "data": [
       126,
@@ -43,8 +29,8 @@
     ],
     "created_by": "hassanabidamin",
     "description": "Star Wars Characters",
-    "date_modified": "2023-11-28",
-    "isVisible": true
+    "date_modified": "2023-11-29",
+    "isVisible": false
   },
   "Marvel Heroes": {
     "data": [
@@ -63,6 +49,15 @@
     "created_by": "habid22",
     "description": "Test",
     "date_modified": "2023-11-28",
+    "isVisible": true
+  },
+  "TestListAgain": {
+    "data": [
+      345
+    ],
+    "created_by": "habid22",
+    "description": "test",
+    "date_modified": "2023-11-29",
     "isVisible": true
   }
 }
