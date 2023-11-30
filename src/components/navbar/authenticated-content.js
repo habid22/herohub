@@ -1140,6 +1140,12 @@ function ViewPublicLists() {
   const [selectedList, setSelectedList] = useState(null);
   const [listDetails, setListDetails] = useState({});
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [isCommentModalOpen, setCommentModalOpen] = useState(false);
+  const [commentInput, setCommentInput] = useState(''); // New state variable
+  const [isCommentsModalOpen, setCommentsModalOpen] = useState(false);
+  const [fetchedComments, setFetchedComments] = useState([]);
+
+
 
   const fetchDateModified = (listName) => {
     axios
@@ -1272,6 +1278,60 @@ function ViewPublicLists() {
     setSelectedList(null);
   };
 
+  const handleAddComment = () => {
+    // Make sure there's a selected list
+    if (!selectedList) {
+      console.error('No selected list to add comment to');
+      return;
+    }
+
+    // Make a request to the API endpoint to add a comment
+    axios
+      .put(`http://localhost:4000/api/lists/${selectedList}/comments`, {
+        comment: commentInput,
+      })
+      .then((response) => {
+        // Successfully added comment, update the UI or take other actions as needed
+        console.log(response.data);
+        
+        // Close the modal after adding the comment
+        setCommentModalOpen(false);
+
+        // You might want to refetch the data or update the state to reflect the new comment
+        // Example: refetchData();
+      })
+      .catch((error) => {
+        console.error('Error adding comment:', error);
+      });
+  };
+
+  // Function to handle opening and closing of the comment modal
+  const handleCommentModalToggle = () => {
+    setCommentModalOpen(!isCommentModalOpen);
+  };  
+
+  const handleViewCommentsToggle = () => {
+    // Make sure there's a selected list
+    if (!selectedList) {
+      console.error('No selected list to view comments');
+      return;
+    }
+  
+    // Fetch comments for the selected list
+    axios
+      .get(`http://localhost:4000/api/lists/${selectedList}/comments`)
+      .then((response) => {
+        // Successfully fetched comments, update the UI
+        setFetchedComments(response.data.comments);
+  
+        // Open the comments modal
+        setCommentsModalOpen(true);
+      })
+      .catch((error) => {
+        console.error('Error fetching comments:', error);
+      });
+  };
+
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
       {sortedLists.map((listName) => (
@@ -1287,6 +1347,15 @@ function ViewPublicLists() {
           </Text>
           <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
             {selectedList === listName ? 'Hide Details' : 'View Details'}
+          </Button>
+           {/* Button to open the "Add Comment" modal */}
+          <Button size="sm" onClick={handleCommentModalToggle} mt={2}>
+            Add Comment
+          </Button>
+
+
+          <Button size="sm" onClick={handleViewCommentsToggle} mt={2}>
+            View Comments
           </Button>
 
           {selectedList === listName && listDetails[listName] && !detailsLoading && (
@@ -1316,6 +1385,55 @@ function ViewPublicLists() {
                     <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
                   </Flex>
                 ))}
+                 {/* Modal component for adding comments */}
+                <Modal isOpen={isCommentModalOpen} onClose={handleCommentModalToggle}>
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalHeader>Add Comment</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                      {/* Add your comment input */}
+                      <input
+                        type="text"
+                        value={commentInput}
+                        onChange={(e) => setCommentInput(e.target.value)}
+                        placeholder="Type your comment here"
+                      />
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button colorScheme="blue" mr={3} onClick={handleAddComment}>
+                        Add Comment
+                      </Button>
+                      <Button colorScheme="red" onClick={handleCommentModalToggle}>
+                        Cancel
+                      </Button>
+                    </ModalFooter>
+                  </ModalContent>
+                </Modal>
+                {/* Modal component for viewing comments */}
+                <Modal isOpen={isCommentsModalOpen} onClose={() => setCommentsModalOpen(false)}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>View Comments</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    {/* Display fetched comments here */}
+                    {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
+                      fetchedComments.map((comment, index) => (
+                        <div key={index}>{comment}</div>
+                      ))
+                    ) : (
+                      <div>No comments available</div>
+                    )}
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button colorScheme="blue" onClick={() => setCommentsModalOpen(false)}>
+                      Close
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+                
             </Flex>
           )}
         </Flex>

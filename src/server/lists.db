@@ -7,9 +7,11 @@
       4
     ],
     "created_by": "User123",
-    "date_modified": "2023-09-23",
+    "date_modified": "2023-11-29",
     "isVisible": true,
-    "comments": "Nice selection."
+    "comments": [
+      "test"
+    ]
   },
   "hassan": {
     "data": [
@@ -21,7 +23,12 @@
     "description": "Updated description for the sample list",
     "date_modified": "2023-11-30",
     "isVisible": true,
-    "comments": "great"
+    "comments": [
+      "yay",
+      "again",
+      "test123",
+      "wer"
+    ]
   },
   "Star Wars": {
     "data": [
@@ -31,7 +38,7 @@
     ],
     "created_by": "hassanabidamin",
     "description": "Star Wars Characters",
-    "date_modified": "2023-11-29",
+    "date_modified": "2023-11-30",
     "isVisible": false,
     "comments": "Great list!"
   },
@@ -75,6 +82,8 @@
     "description": "Hey!",
     "date_modified": "2023-11-30",
     "isVisible": true,
-    "comments": "great list!"
+    "comments": [
+      "This is wonderful!"
+    ]
   }
 }

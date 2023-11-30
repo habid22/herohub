@@ -614,7 +614,7 @@ app.patch('/api/lists/:name/visibilityTrue', (req, res) => {
 });
 
 // Endpoint to add a comment to a specific list
-app.patch('/api/lists/:name/comments', (req, res) => {
+app.put('/api/lists/:name/comments', (req, res) => {
   const { name } = req.params;
   const { comment } = req.body;
 
@@ -624,8 +624,8 @@ app.patch('/api/lists/:name/comments', (req, res) => {
     return res.status(404).send('List not found');
   }
 
-  // Initialize the "comments" field as an empty array if it doesn't exist
-  if (!lists[name].comments) {
+  // If the list doesn't have a "comments" field or it's not an array, initialize it as an array
+  if (!Array.isArray(lists[name].comments)) {
     lists[name].comments = [];
   }
 
@@ -639,6 +639,21 @@ app.patch('/api/lists/:name/comments', (req, res) => {
   writeListsToFile(lists);
 
   res.send(`Comment added to the list ${name} successfully`);
+});
+
+// Endpoint to get comments for a specific list
+app.get('/api/lists/:name/comments', (req, res) => {
+  const { name } = req.params;
+
+  const lists = readListsFromFile();
+
+  if (!lists[name]) {
+    return res.status(404).send('List not found');
+  }
+
+  const comments = lists[name].comments || [];
+
+  res.json({ comments });
 });
 
 
