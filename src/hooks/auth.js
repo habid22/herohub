@@ -77,6 +77,19 @@ export function useLogin() {
       const username = await fetchUsername(userCredential.user.uid);
       console.log('Logged in as:', username);
 
+      // Check if the account is deactivated
+      if (username.includes("(deactivated)")) {
+        toast({
+          title: 'This account has been deactivated, please contact the administrator.',
+          status: 'error',
+          isClosable: true,
+          position: 'top',
+          duration: 5000,
+        });
+        setLoading(false);
+        return false; // Return false if login failed due to deactivated account
+      }
+
       // Get JWT token
       const idToken = await userCredential.user.getIdToken();
       console.log('JWT Token:', idToken);

@@ -39,7 +39,7 @@
     ],
     "created_by": "habid22",
     "description": "Test Modified",
-    "date_modified": "2023-11-29",
+    "date_modified": "2023-11-30",
     "isVisible": false
   },
   "FunctionalityTest": {
@@ -58,6 +58,16 @@
     "created_by": "habid22",
     "description": "test",
     "date_modified": "2023-11-29",
+    "isVisible": true
+  },
+  "Gamerboy's List": {
+    "data": [
+      56,
+      79
+    ],
+    "created_by": "gamerboy",
+    "description": "Hey!",
+    "date_modified": "2023-11-30",
     "isVisible": true
   }
 }

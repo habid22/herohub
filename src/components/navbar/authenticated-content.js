@@ -32,6 +32,7 @@ import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, query, where } from "firebase/firestore";
 
 
 // things to implement for lists
@@ -39,8 +40,50 @@ import { collection, getDocs } from 'firebase/firestore';
 // 2. add privacy options to lists
 // 3. sort public lists by date modified
 
+// Add this function inside your Header component
+const deactivateUser = async (username) => {
+  try {
+    // Find the user document with the given username
+    const userSnapshot = await getDocs(query(collection(db, 'users'), where('username', '==', username)));
+    const userDoc = userSnapshot.docs[0];
 
+    // Update the 'username' field of the user document to include "(deactivated)"
+    await updateDoc(doc(db, 'users', userDoc.id), {
+      username: `${username} (deactivated)`
+    });
 
+    console.log(`User ${username} has been deactivated.`);
+  } catch (error) {
+    console.error("Error deactivating user:", error);
+  }
+};
+
+const activateUser = async (username) => {
+  try {
+    // Append "(deactivated)" to the username
+    const deactivatedUsername = `${username} (deactivated)`;
+
+    // Find the user document with the given username
+    const userSnapshot = await getDocs(query(collection(db, 'users'), where('username', '==', deactivatedUsername)));
+    
+    // Check if the user document exists
+    if (userSnapshot.empty) {
+      console.error(`No user found with the username: ${deactivatedUsername}`);
+      return;
+    }
+
+    const userDoc = userSnapshot.docs[0];
+
+    // Update the 'username' field of the user document to remove "(deactivated)"
+    await updateDoc(doc(db, 'users', userDoc.id), {
+      username: username
+    });
+
+    console.log(`User ${username} has been activated.`);
+  } catch (error) {
+    console.error("Error activating user:", error);
+  }
+};
 
 export default function LogInContent() {
   return (
@@ -187,8 +230,13 @@ export default function LogInContent() {
               right="5%"
               transform="translateY(-50%)"
             >
-              <Button colorScheme="red" size="sm">
-                Deactivate
+
+
+              <Button colorScheme="green" size="sm" right="5%" onClick={() => activateUser(username.replace(' (deactivated)', ''))}>
+                Activate
+              </Button>
+              <Button colorScheme="red" size="sm" onClick={() => deactivateUser(username)}>
+                Disable
               </Button>
             </Flex>
           </Box>
