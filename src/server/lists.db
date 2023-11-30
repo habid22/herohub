@@ -8,7 +8,8 @@
     ],
     "created_by": "User123",
     "date_modified": "2023-09-23",
-    "isVisible": true
+    "isVisible": true,
+    "comments": "Nice selection."
   },
   "hassan": {
     "data": [
@@ -18,8 +19,9 @@
     ],
     "created_by": "hs27",
     "description": "Updated description for the sample list",
-    "date_modified": "2023-11-26",
-    "isVisible": true
+    "date_modified": "2023-11-30",
+    "isVisible": true,
+    "comments": "great"
   },
   "Star Wars": {
     "data": [
@@ -30,7 +32,8 @@
     "created_by": "hassanabidamin",
     "description": "Star Wars Characters",
     "date_modified": "2023-11-29",
-    "isVisible": false
+    "isVisible": false,
+    "comments": "Great list!"
   },
   "Marvel Heroes": {
     "data": [
@@ -40,7 +43,8 @@
     "created_by": "habid22",
     "description": "Test Modified",
     "date_modified": "2023-11-30",
-    "isVisible": false
+    "isVisible": false,
+    "comments": "I love this list!"
   },
   "FunctionalityTest": {
     "data": [
@@ -48,8 +52,9 @@
     ],
     "created_by": "habid22",
     "description": "Test",
-    "date_modified": "2023-11-28",
-    "isVisible": true
+    "date_modified": "2023-11-30",
+    "isVisible": false,
+    "comments": "Very interesting."
   },
   "TestListAgain": {
     "data": [
@@ -58,7 +63,8 @@
     "created_by": "habid22",
     "description": "test",
     "date_modified": "2023-11-30",
-    "isVisible": true
+    "isVisible": true,
+    "comments": "Nice selection."
   },
   "Gamerboy's List": {
     "data": [
@@ -68,6 +74,7 @@
     "created_by": "gamerboy",
     "description": "Hey!",
     "date_modified": "2023-11-30",
-    "isVisible": true
+    "isVisible": true,
+    "comments": "great list!"
   }
 }

@@ -613,6 +613,33 @@ app.patch('/api/lists/:name/visibilityTrue', (req, res) => {
   res.send(`Visibility for the list ${name} set to true successfully`);
 });
 
+// Endpoint to add a comment to a specific list
+app.patch('/api/lists/:name/comments', (req, res) => {
+  const { name } = req.params;
+  const { comment } = req.body;
+
+  const lists = readListsFromFile();
+
+  if (!lists[name]) {
+    return res.status(404).send('List not found');
+  }
+
+  // Initialize the "comments" field as an empty array if it doesn't exist
+  if (!lists[name].comments) {
+    lists[name].comments = [];
+  }
+
+  // Add the comment to the list's "comments" field
+  lists[name].comments.push(comment);
+
+  // Update the date_modified field
+  lists[name].date_modified = new Date().toISOString().split('T')[0];
+
+  // Write the updated lists to the file
+  writeListsToFile(lists);
+
+  res.send(`Comment added to the list ${name} successfully`);
+});
 
 
 
