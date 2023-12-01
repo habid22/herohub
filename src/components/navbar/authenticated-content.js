@@ -1418,28 +1418,30 @@ function ViewPublicLists() {
                 </Modal>
                 {/* Modal component for viewing comments */}
                 <Modal isOpen={isCommentsModalOpen} onClose={() => setCommentsModalOpen(false)}  size="full">
-                  <ModalOverlay />
-                  <ModalContent>
-                    <ModalHeader>View Comments</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                      {/* Display fetched comments here */}
-                      {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
-                        fetchedComments.map((comment, index) => (
-                          <div key={index} style={{ borderBottom: '1px solid #f5f5f5', padding: '10px 0' }}>{comment}</div>
-                        ))
-                      ) : (
-                        <div>No comments available</div>
-                      )}
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button colorScheme="teal" onClick={() => setCommentsModalOpen(false)}>
-                        Close
-                      </Button>
-                    </ModalFooter>
-                  </ModalContent>
-                </Modal>
-                
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>View Comments</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    {/* Display fetched comments here */}
+                    {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
+                      fetchedComments.map((comment, index) => (
+                        <div key={index} style={{ borderBottom: '1px solid #f5f5f5', padding: '10px 0', display: 'flex', justifyContent: 'space-between' }}>
+                          <div>{comment}</div>
+                          <Button colorScheme="red">Delete</Button>
+                        </div>
+                      ))
+                    ) : (
+                      <div>No comments available</div>
+                    )}
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button colorScheme="teal" onClick={() => setCommentsModalOpen(false)}>
+                      Close
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
             </Flex>
           )}
         </Flex>
