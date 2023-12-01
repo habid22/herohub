@@ -50,8 +50,8 @@
     ],
     "created_by": "habid22",
     "description": "Test",
-    "date_modified": "2023-11-30",
-    "isVisible": false,
+    "date_modified": "2023-12-01",
+    "isVisible": true,
     "comments": []
   },
   "Gamerboy's List": {
@@ -88,7 +88,7 @@
     "created_by": "habid22",
     "description": "123",
     "date_modified": "2023-12-01",
-    "isVisible": false,
+    "isVisible": true,
     "comments": []
   }
 }
