@@ -10,7 +10,6 @@
     "date_modified": "2023-12-01",
     "isVisible": true,
     "comments": [
-      "test",
       "habid22 commented: commenta"
     ]
   },
@@ -25,13 +24,10 @@
     "date_modified": "2023-12-01",
     "isVisible": true,
     "comments": [
-      "yay",
-      "again",
-      "test123",
-      "wer",
       "habid22: test",
       "habid22 commented: test",
-      "habid22 commented: hey this is a comment!"
+      "habid22 commented: hey this is a comment!",
+      "gamerboy commented: this is such a cool list!"
     ]
   },
   "Star Wars": {
@@ -44,7 +40,7 @@
     "description": "Star Wars Characters",
     "date_modified": "2023-11-30",
     "isVisible": false,
-    "comments": "Great list!"
+    "comments": []
   },
   "FunctionalityTest": {
     "data": [
@@ -54,20 +50,7 @@
     "description": "Test",
     "date_modified": "2023-11-30",
     "isVisible": false,
-    "comments": "Very interesting."
-  },
-  "TestListAgain": {
-    "data": [
-      345
-    ],
-    "created_by": "habid22",
-    "description": "test",
-    "date_modified": "2023-12-01",
-    "isVisible": true,
-    "comments": [
-      "habid22 commented: comment1",
-      "habid22 commented: commenta"
-    ]
+    "comments": []
   },
   "Gamerboy's List": {
     "data": [
@@ -79,8 +62,19 @@
     "date_modified": "2023-12-01",
     "isVisible": true,
     "comments": [
-      "This is wonderful!",
       "habid22 commented: commenta"
+    ]
+  },
+  "Hey Guys They Added Comments!": {
+    "data": [
+      4
+    ],
+    "created_by": "gamerboy",
+    "description": "Test",
+    "date_modified": "2023-12-01",
+    "isVisible": true,
+    "comments": [
+      "habid22 commented: so cool!"
     ]
   }
 }
