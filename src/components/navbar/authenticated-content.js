@@ -33,6 +33,8 @@ import axios from "axios";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from 'firebase/firestore';
 import { doc, updateDoc, query, where } from "firebase/firestore";
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+console.log('API Base URL:', apiBaseUrl);
 
 
 // things to implement for lists
@@ -307,16 +309,17 @@ function HeroSearchContainer() {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/superheroes/multi-search", {
+      const response = await axios.get(`${apiBaseUrl}/api/superheroes/multi-search`, {
         params: searchParams,
       });
-
+  
       // Set the search results in the state
       setSearchResults(response.data);
-
+  
       // Update searchClicked to true
       setSearchClicked(true);
     } catch (error) {
+      // Handle error
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
