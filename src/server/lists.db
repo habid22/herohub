@@ -82,13 +82,5 @@
       "This is wonderful!",
       "habid22 commented: commenta"
     ]
-  },
-  "DB TEST": {
-    "data": [],
-    "created_by": "habid22",
-    "description": "123",
-    "date_modified": "2023-12-01",
-    "isVisible": true,
-    "comments": []
   }
 }
