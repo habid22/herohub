@@ -37,10 +37,7 @@ const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 console.log('API Base URL:', apiBaseUrl);
 
 
-// things to implement for lists
-// 1. ability to update a description for a list
-// 2. add privacy options to lists
-// 3. sort public lists by date modified
+//test commit
 
 // Add this function inside your Header component
 const deactivateUser = async (username) => {
