@@ -1147,6 +1147,10 @@ function ViewPublicLists() {
   const [commentInput, setCommentInput] = useState(''); // New state variable
   const [isCommentsModalOpen, setCommentsModalOpen] = useState(false);
   const [fetchedComments, setFetchedComments] = useState([]);
+  const toast = useToast();
+  const { user } = useAuth();
+  
+
 
 
 
@@ -1287,11 +1291,11 @@ function ViewPublicLists() {
       console.error('No selected list to add comment to');
       return;
     }
-
+  
     // Make a request to the API endpoint to add a comment
     axios
       .put(`http://localhost:4000/api/lists/${selectedList}/comments`, {
-        comment: commentInput,
+        comment: `${user.username} commented: ${commentInput}`,
       })
       .then((response) => {
         // Successfully added comment, update the UI or take other actions as needed
@@ -1299,7 +1303,7 @@ function ViewPublicLists() {
         
         // Close the modal after adding the comment
         setCommentModalOpen(false);
-
+  
         // You might want to refetch the data or update the state to reflect the new comment
         // Example: refetchData();
       })
@@ -1307,7 +1311,6 @@ function ViewPublicLists() {
         console.error('Error adding comment:', error);
       });
   };
-
   // Function to handle opening and closing of the comment modal
   const handleCommentModalToggle = () => {
     setCommentModalOpen(!isCommentModalOpen);
@@ -1337,29 +1340,32 @@ function ViewPublicLists() {
 
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
-      {sortedLists.map((listName) => (
-        <Flex key={listName} flexDirection="column" mt={4}>
-          <Text fontWeight="bold" fontSize="xl">
-            List Name: {listName}
-          </Text>
-          <Text>
-            Created by: {listDetails[listName]?.created_by || 'Not available'}
-          </Text>
-          <Text>
-            Date Modified: {listDetails[listName]?.date_modified || 'Not available'}
-          </Text>
-          <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
-            {selectedList === listName ? 'Hide Details' : 'View Details'}
-          </Button>
-           {/* Button to open the "Add Comment" modal */}
-          <Button size="sm" onClick={handleCommentModalToggle} mt={2}>
-            Add Comment
-          </Button>
+    {sortedLists.map((listName) => (
+      <Flex key={listName} flexDirection="column" mt={4}>
+        <Text fontWeight="bold" fontSize="xl">
+          List Name: {listName}
+        </Text>
+        <Text>
+          Created by: {listDetails[listName]?.created_by || 'Not available'}
+        </Text>
+        <Text>
+          Date Modified: {listDetails[listName]?.date_modified || 'Not available'}
+        </Text>
+        <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
+          {selectedList === listName ? 'Hide Details' : 'View Details'}
+        </Button>
+        {selectedList === listName && (
+          <>
+            {/* Button to open the "Add Comment" modal */}
+            <Button size="sm" onClick={handleCommentModalToggle} mt={2}>
+              Add Comment
+            </Button>
 
-
-          <Button size="sm" onClick={handleViewCommentsToggle} mt={2}>
-            View Comments
-          </Button>
+            <Button size="sm" onClick={handleViewCommentsToggle} mt={2}>
+              View Comments
+            </Button>
+          </>
+        )}
 
           {selectedList === listName && listDetails[listName] && !detailsLoading && (
             <Flex flexDirection="column" mt={2}>
@@ -1414,28 +1420,28 @@ function ViewPublicLists() {
                   </ModalContent>
                 </Modal>
                 {/* Modal component for viewing comments */}
-                <Modal isOpen={isCommentsModalOpen} onClose={() => setCommentsModalOpen(false)}>
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalHeader>View Comments</ModalHeader>
-                  <ModalCloseButton />
-                  <ModalBody>
-                    {/* Display fetched comments here */}
-                    {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
-                      fetchedComments.map((comment, index) => (
-                        <div key={index}>{comment}</div>
-                      ))
-                    ) : (
-                      <div>No comments available</div>
-                    )}
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button colorScheme="blue" onClick={() => setCommentsModalOpen(false)}>
-                      Close
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
+                <Modal isOpen={isCommentsModalOpen} onClose={() => setCommentsModalOpen(false)}  size="full">
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalHeader>View Comments</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                      {/* Display fetched comments here */}
+                      {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
+                        fetchedComments.map((comment, index) => (
+                          <div key={index} style={{ borderBottom: '1px solid #f5f5f5', padding: '10px 0' }}>{comment}</div>
+                        ))
+                      ) : (
+                        <div>No comments available</div>
+                      )}
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button colorScheme="teal" onClick={() => setCommentsModalOpen(false)}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </ModalContent>
+                </Modal>
                 
             </Flex>
           )}
