@@ -1395,22 +1395,22 @@ function ViewPublicLists() {
                   </Flex>
                 ))}
                  {/* Modal component for adding comments */}
-                <Modal isOpen={isCommentModalOpen} onClose={handleCommentModalToggle}>
+                <Modal isOpen={isCommentModalOpen} onClose={handleCommentModalToggle} size="xl">
                   <ModalOverlay />
                   <ModalContent>
                     <ModalHeader>Add Comment</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                       {/* Add your comment input */}
-                      <input
-                        type="text"
+                      <textarea
                         value={commentInput}
                         onChange={(e) => setCommentInput(e.target.value)}
-                        placeholder="Type your comment here"
+                        placeholder=" Type your comment here"
+                        style={{ width: '100%', height: '100px' }}
                       />
                     </ModalBody>
                     <ModalFooter>
-                      <Button colorScheme="blue" mr={3} onClick={handleAddComment}>
+                      <Button colorScheme="teal" mr={3} onClick={handleAddComment}>
                         Add Comment
                       </Button>
                       <Button colorScheme="red" onClick={handleCommentModalToggle}>
