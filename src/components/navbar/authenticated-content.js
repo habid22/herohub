@@ -1445,13 +1445,13 @@ function ViewPublicLists() {
                   <ModalHeader>View Comments</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody>
-                      {/* Display fetched comments here */}
-                      {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
+                    {/* Display fetched comments here */}
+                    {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
                       fetchedComments.map((comment, index) => (
                         <div key={index} style={{ borderBottom: '1px solid #f5f5f5', padding: '10px 0', display: 'flex', justifyContent: 'space-between' }}>
-                          <div>{comment}</div>
+                          <div>{comment.text}</div>
                           {isAdminUser && (
-                             <Button colorScheme="red" onClick={() => handleDeleteComment(index)}>
+                            <Button colorScheme="red" onClick={() => handleDeleteComment(index)}>
                               Delete
                             </Button>
                           )}

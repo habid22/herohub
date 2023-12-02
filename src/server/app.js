@@ -618,7 +618,7 @@ app.patch('/api/lists/:name/visibilityTrue', (req, res) => {
 // Endpoint to add a comment to a specific list
 app.put('/api/lists/:name/comments', (req, res) => {
   const { name } = req.params;
-  const { comment } = req.body;
+  const { comment, visibility } = req.body;
 
   const lists = readListsFromFile();
 
@@ -631,8 +631,11 @@ app.put('/api/lists/:name/comments', (req, res) => {
     lists[name].comments = [];
   }
 
-  // Add the comment to the list's "comments" field
-  lists[name].comments.push(comment);
+  // Add the comment to the list's "comments" field with visibility
+  lists[name].comments.push({
+    text: comment,
+    visibility: visibility !== undefined ? visibility : true
+  });
 
   // Update the date_modified field
   lists[name].date_modified = new Date().toISOString().split('T')[0];

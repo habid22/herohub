@@ -10,11 +10,30 @@
     "date_modified": "2023-12-02",
     "isVisible": true,
     "comments": [
-      "habid22 commented: commenta",
-      "habid22 commented: This is a test comment!",
-      "gamerboy commented: I really like this list!",
-      "habid22 commented: test",
-      "hassanabidamin commented: hey"
+      {
+        "text": "habid22 commented: commenta",
+        "visibility": true
+      },
+      {
+        "text": "habid22 commented: This is a test comment!",
+        "visibility": true
+      },
+      {
+        "text": "gamerboy commented: I really like this list!",
+        "visibility": true
+      },
+      {
+        "text": "habid22 commented: test",
+        "visibility": true
+      },
+      {
+        "text": "hassanabidamin commented: hey",
+        "visibility": true
+      },
+      {
+        "text": "habid22 commented: test",
+        "visibility": true
+      }
     ]
   },
   "hassan": {
@@ -28,11 +47,26 @@
     "date_modified": "2023-12-02",
     "isVisible": true,
     "comments": [
-      "habid22: test",
-      "habid22 commented: test",
-      "habid22 commented: hey this is a comment!",
-      "gamerboy commented: this is such a cool list!",
-      "habid22 commented: testing123123"
+      {
+        "text": "habid22: test",
+        "visibility": true
+      },
+      {
+        "text": "habid22 commented: test",
+        "visibility": true
+      },
+      {
+        "text": "habid22 commented: hey this is a comment!",
+        "visibility": true
+      },
+      {
+        "text": "gamerboy commented: this is such a cool list!",
+        "visibility": true
+      },
+      {
+        "text": "habid22 commented: testing123123",
+        "visibility": true
+      }
     ]
   },
   "Star Wars": {
@@ -56,7 +90,10 @@
     "date_modified": "2023-12-02",
     "isVisible": true,
     "comments": [
-      "habid22 commented: heyyy"
+      {
+        "text": "habid22 commented: heyyy",
+        "visibility": true
+      }
     ]
   },
   "Gamerboy's List": {
@@ -69,10 +106,22 @@
     "date_modified": "2023-12-02",
     "isVisible": true,
     "comments": [
-      "habid22 commented: commenta",
-      "gamerboy commented: Hey this is my list guys!",
-      "habid22 commented: I de-activated you account!",
-      "habid22 commented: Can you see this?"
+      {
+        "text": "habid22 commented: commenta",
+        "visibility": true
+      },
+      {
+        "text": "gamerboy commented: Hey, this is my list guys!",
+        "visibility": true
+      },
+      {
+        "text": "habid22 commented: I de-activated your account!",
+        "visibility": true
+      },
+      {
+        "text": "habid22 commented: Can you see this?",
+        "visibility": true
+      }
     ]
   }
 }
