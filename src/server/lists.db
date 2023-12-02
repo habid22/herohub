@@ -12,7 +12,7 @@
     "comments": [
       {
         "text": "habid22 commented: commenta",
-        "visibility": false
+        "visibility": true
       },
       {
         "text": "habid22 commented: This is a test comment!",
@@ -20,7 +20,7 @@
       },
       {
         "text": "gamerboy commented: I really like this list!",
-        "visibility": true
+        "visibility": false
       },
       {
         "text": "habid22 commented: test",

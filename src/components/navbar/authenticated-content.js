@@ -1357,6 +1357,29 @@ function ViewPublicLists() {
       });
   };
 
+
+  const handleShowComment = (index) => {
+    // Make sure there's a selected list
+    if (!selectedList) {
+      console.error('No selected list to update comment visibility');
+      return;
+    }
+
+    // Make a request to the API endpoint to update the visibility of a comment to true
+    axios
+      .put(`http://localhost:4000/api/lists/${selectedList}/comments/${index}/visibility/true`)
+      .then((response) => {
+        // Successfully updated comment visibility, update the UI or take other actions as needed
+        console.log(response.data);
+
+        // You might want to refetch the data or update the state to reflect the updated comment visibility
+        // Example: refetchData();
+      })
+      .catch((error) => {
+        console.error('Error updating comment visibility:', error);
+      });
+  };
+
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
     {sortedLists.map((listName) => (
@@ -1445,31 +1468,43 @@ function ViewPublicLists() {
                   <ModalHeader>View Comments</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody>
-                    {/* Display fetched comments here */}
-                    {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
-                      fetchedComments
-                        .filter((comment) => (isAdminUser || comment.visibility) ? comment : null)
-                        .map((comment, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              borderBottom: '1px solid #f5f5f5',
-                              padding: '10px 0',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                          >
-                            <div>{comment.text}</div>
-                            {isAdminUser && (
-                              <Button colorScheme="red" onClick={() => handleDeleteComment(index)}>
-                                Hide
-                              </Button>
-                            )}
+                {/* Display fetched comments here */}
+                {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
+                  fetchedComments
+                    .filter((comment) => (isAdminUser || comment.visibility) ? comment : null)
+                    .map((comment, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          borderBottom: '1px solid #f5f5f5',
+                          padding: '10px 0',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <div>{comment.text}</div>
+                        {isAdminUser && (
+                          <div>
+                            <Button
+                              colorScheme="red"
+                              onClick={() => handleDeleteComment(index, false)}
+                              mr={2}
+                            >
+                              Hide
+                            </Button>
+                            <Button
+                              colorScheme="green"
+                              onClick={() => handleShowComment(index)}
+                            >
+                              Show
+                            </Button>
                           </div>
-                        ))
-                    ) : (
-                      <div>No comments available</div>
-                    )}
+                        )}
+                      </div>
+                    ))
+                ) : (
+                  <div>No comments available</div>
+                )}
                   </ModalBody>
                   <ModalFooter>
                     <Button colorScheme="teal" onClick={() => setCommentsModalOpen(false)}>
