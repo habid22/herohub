@@ -25,13 +25,14 @@
     ],
     "created_by": "hs27",
     "description": "Updated description for the sample list",
-    "date_modified": "2023-12-01",
+    "date_modified": "2023-12-02",
     "isVisible": true,
     "comments": [
       "habid22: test",
       "habid22 commented: test",
       "habid22 commented: hey this is a comment!",
-      "gamerboy commented: this is such a cool list!"
+      "gamerboy commented: this is such a cool list!",
+      "habid22 commented: testing123123"
     ]
   },
   "Star Wars": {

@@ -1144,8 +1144,8 @@ function ViewPublicLists() {
   const [commentInput, setCommentInput] = useState(''); // New state variable
   const [isCommentsModalOpen, setCommentsModalOpen] = useState(false);
   const [fetchedComments, setFetchedComments] = useState([]);
-  const toast = useToast();
   const { user } = useAuth();
+  const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
   
 
 
@@ -1335,6 +1335,7 @@ function ViewPublicLists() {
       });
   };
 
+  
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
     {sortedLists.map((listName) => (
@@ -1423,12 +1424,16 @@ function ViewPublicLists() {
                   <ModalHeader>View Comments</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody>
-                    {/* Display fetched comments here */}
-                    {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
+                      {/* Display fetched comments here */}
+                      {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
                       fetchedComments.map((comment, index) => (
                         <div key={index} style={{ borderBottom: '1px solid #f5f5f5', padding: '10px 0', display: 'flex', justifyContent: 'space-between' }}>
                           <div>{comment}</div>
-                          <Button colorScheme="red">Delete</Button>
+                          {isAdminUser && (
+                             <Button colorScheme="red" onClick={() => handleDeleteComment(index)}>
+                              Delete
+                            </Button>
+                          )}
                         </div>
                       ))
                     ) : (
