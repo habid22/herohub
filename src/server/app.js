@@ -689,7 +689,6 @@ app.put('/api/lists/:listName/comments/:commentIndex/visibility', (req, res) => 
   res.send(`Visibility of comment at index ${commentIndex} in ${listName} set to false`);
 });
 
-
 // Endpoint to set the visibility of a comment in a specific list to true
 app.put('/api/lists/:listName/comments/:commentIndex/visibility/true', (req, res) => {
   const { listName, commentIndex } = req.params;

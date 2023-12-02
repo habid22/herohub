@@ -306,7 +306,7 @@ function HeroSearchContainer() {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`${apiBaseUrl}/api/superheroes/multi-search`, {
+      const response = await axios.get('/api/superheroes/multi-search', {
         params: searchParams,
       });
   
@@ -327,6 +327,7 @@ function HeroSearchContainer() {
       });
     }
   };
+  
 
   return (
     <Flex
@@ -511,7 +512,7 @@ function CreateList() {
   const handleCreateList = async () => {
     try {
       console.log('Request Data:', listParams);
-      const response = await axios.post("http://localhost:4000/api/lists", listParams);
+      const response = await axios.post(`/api/lists`, listParams); // Updated the URL
 
       setListCreated(true);
 
@@ -535,7 +536,6 @@ function CreateList() {
       });
     }
   };
-
 
   return (
     <Flex
@@ -562,7 +562,6 @@ function CreateList() {
         mb={4}
       />
 
-      {/* Remove the created_by input field */}
       {/* The created_by field is automatically set based on the logged-in user */}
 
       <Input
@@ -571,7 +570,6 @@ function CreateList() {
         value={listParams.description}
         width={["100%", "100%", "100%", "50%"]}
         onChange={handleInputChange}
-       
         mb={4}
       />
 
@@ -613,23 +611,22 @@ function AddToList() {
   const { user } = useAuth();
 
   useEffect(() => {
-    // Fetch the user's lists when the component mounts
     const fetchUserLists = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/lists/created_by/${user.username}`);
+        const response = await axios.get(`/api/lists/created_by/${user.username}`);
         setUserLists(response.data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
 
-    // Assuming you have access to the user object (you mentioned it in the existing code)
-    fetchUserLists();
+    if (user) {
+      fetchUserLists();
+    }
   }, [user]);
 
   const handleAddHeroToList = async () => {
     try {
-      // Ensure both list and heroId are selected
       if (!selectedList || !heroId) {
         toast({
           title: "Error",
@@ -641,8 +638,7 @@ function AddToList() {
         return;
       }
 
-      // Send a PUT request to add the hero to the selected list
-      const response = await axios.put(`http://localhost:4000/api/lists/${encodeURIComponent(selectedList)}`, {
+      const response = await axios.put(`/api/lists/${encodeURIComponent(selectedList)}`, {
         superheroIds: [parseInt(heroId, 10)], // Ensure heroId is parsed as an integer
       });
 
@@ -670,7 +666,11 @@ function AddToList() {
       <Text fontSize="xl" fontWeight="bold" mb={4} textAlign="center">
         Add Hero to a List 🦸‍♂️
       </Text>
-      <Select placeholder="Select a List" value={selectedList} onChange={(e) => setSelectedList(e.target.value)}>
+      <Select
+        placeholder="Select a List"
+        value={selectedList}
+        onChange={(e) => setSelectedList(e.target.value)}
+      >
         {userLists.map((listName) => (
           <option key={listName} value={listName}>
             {listName}
@@ -695,28 +695,27 @@ function AddToList() {
 function UpdateDescriptionList() {
   const [userLists, setUserLists] = useState([]);
   const [selectedList, setSelectedList] = useState("");
-  const [newDescription, setNewDescription] = useState("")
+  const [newDescription, setNewDescription] = useState("");
   const toast = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
-    // Fetch the user's lists when the component mounts
     const fetchUserLists = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/lists/created_by/${user.username}`);
+        const response = await axios.get(`/api/lists/created_by/${user.username}`);
         setUserLists(response.data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
 
-    // Assuming you have access to the user object (you mentioned it in the existing code)
-    fetchUserLists();
+    if (user) {
+      fetchUserLists();
+    }
   }, [user]);
 
   const handleUpdateDescription = async () => {
     try {
-      // Ensure both list and newDescription are selected
       if (!selectedList || !newDescription) {
         toast({
           title: "Error",
@@ -728,9 +727,8 @@ function UpdateDescriptionList() {
         return;
       }
 
-      // Send a PATCH request to update the list description
       const response = await axios.patch(
-        `http://localhost:4000/api/lists/${encodeURIComponent(selectedList)}/description`,
+        `/api/lists/${encodeURIComponent(selectedList)}/description`,
         {
           description: newDescription,
         }
@@ -760,7 +758,11 @@ function UpdateDescriptionList() {
       <Text fontSize="xl" fontWeight="bold" mb={4} textAlign="center">
         Update List Description 📋
       </Text>
-      <Select placeholder="Select a List" value={selectedList} onChange={(e) => setSelectedList(e.target.value)}>
+      <Select
+        placeholder="Select a List"
+        value={selectedList}
+        onChange={(e) => setSelectedList(e.target.value)}
+      >
         {userLists.map((listName) => (
           <option key={listName} value={listName}>
             {listName}
@@ -770,7 +772,7 @@ function UpdateDescriptionList() {
       <Input
         placeholder="Enter New Description"
         value={newDescription}
-        onChange={(e) => setNewDescription(e.target.value)} // Update state when the input changes
+        onChange={(e) => setNewDescription(e.target.value)}
         mt={2}
       />
       <Button colorScheme="teal" mt={4} onClick={handleUpdateDescription}>
@@ -785,28 +787,27 @@ function UpdateDescriptionList() {
 function DeleteFromList() {
   const [userLists, setUserLists] = useState([]);
   const [selectedList, setSelectedList] = useState("");
-  const [heroName, setHeroName] = useState(""); // Changed heroId to heroName
+  const [heroName, setHeroName] = useState("");
   const toast = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
-    // Fetch the user's lists when the component mounts
     const fetchUserLists = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/lists/created_by/${user.username}`);
+        const response = await axios.get(`/api/lists/created_by/${user.username}`);
         setUserLists(response.data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
 
-    // Assuming you have access to the user object (you mentioned it in the existing code)
-    fetchUserLists();
+    if (user) {
+      fetchUserLists();
+    }
   }, [user]);
 
   const handleDeleteHeroFromList = async () => {
     try {
-      // Ensure both list and heroName are selected
       if (!selectedList || !heroName) {
         toast({
           title: "Error",
@@ -818,9 +819,8 @@ function DeleteFromList() {
         return;
       }
 
-      // Send a DELETE request to remove the hero from the selected list
       const response = await axios.delete(
-        `http://localhost:4000/api/lists/${encodeURIComponent(selectedList)}/heroes/${encodeURIComponent(heroName)}`
+        `/api/lists/${encodeURIComponent(selectedList)}/heroes/${encodeURIComponent(heroName)}`
       );
 
       toast({
@@ -847,7 +847,11 @@ function DeleteFromList() {
       <Text fontSize="xl" fontWeight="bold" mb={4} textAlign="center">
         Delete Hero from a List 🗑️
       </Text>
-      <Select placeholder="Select a List" value={selectedList} onChange={(e) => setSelectedList(e.target.value)}>
+      <Select
+        placeholder="Select a List"
+        value={selectedList}
+        onChange={(e) => setSelectedList(e.target.value)}
+      >
         {userLists.map((listName) => (
           <option key={listName} value={listName}>
             {listName}
@@ -879,7 +883,7 @@ function MyCurrentLists() {
 
   const fetchDateModified = (listName) => {
     axios
-      .get(`http://localhost:4000/api/lists/${listName}/date_modified`)
+      .get(`/api/lists/${listName}/date_modified`)
       .then((dateModifiedResponse) => {
         setListDetails((prevDetails) => ({
           ...prevDetails,
@@ -896,7 +900,7 @@ function MyCurrentLists() {
 
   const fetchCreatedBy = (listName) => {
     axios
-      .get(`http://localhost:4000/api/lists/${listName}/created_by`)
+      .get(`/api/lists/${listName}/created_by`)
       .then((createdByResponse) => {
         setListDetails((prevDetails) => ({
           ...prevDetails,
@@ -913,7 +917,7 @@ function MyCurrentLists() {
 
   const fetchHeroes = (listName) => {
     axios
-      .get(`http://localhost:4000/api/lists/${listName}/heroes`)
+      .get(`/api/lists/${listName}/heroes`)
       .then((heroesResponse) => {
         setListDetails((prevDetails) => ({
           ...prevDetails,
@@ -928,14 +932,12 @@ function MyCurrentLists() {
       });
   };
 
-
   const handleMakePrivate = async (listName) => {
     try {
-      await axios.patch(`http://localhost:4000/api/lists/${listName}/visibilityFalse`, {
+      await axios.patch(`/api/lists/${listName}/visibilityFalse`, {
         isVisible: false,
       });
-  
-      // After successfully updating the list visibility, update the userLists state
+
       setUserLists((prevUserLists) =>
         prevUserLists.map((name) => (name === listName ? `${name} (Private)` : name))
       );
@@ -947,11 +949,10 @@ function MyCurrentLists() {
 
   const handleMakePublic = async (listName) => {
     try {
-      await axios.patch(`http://localhost:4000/api/lists/${listName}/visibilityTrue`, {
+      await axios.patch(`/api/lists/${listName}/visibilityTrue`, {
         isVisible: true,
       });
-  
-      // After successfully updating the list visibility, update the userLists state
+
       setUserLists((prevUserLists) =>
         prevUserLists.map((name) => (name === listName ? name.replace(' (Private)', '') : name))
       );
@@ -964,7 +965,7 @@ function MyCurrentLists() {
   useEffect(() => {
     const fetchUserLists = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/lists/created_by/${user.username}`);
+        const response = await axios.get(`/api/lists/created_by/${user.username}`);
         setUserLists(response.data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
@@ -977,32 +978,26 @@ function MyCurrentLists() {
   }, [user]);
 
   useEffect(() => {
-    // Fetch date_modified independently when userLists change
     userLists.forEach((listName) => {
       fetchDateModified(listName);
     });
 
-    // Fetch created_by independently when userLists change
     userLists.forEach((listName) => {
       fetchCreatedBy(listName);
     });
   }, [userLists]);
 
   const handleViewMore = (listName) => {
-    // Set details loading to true when starting to fetch details
     setDetailsLoading(true);
 
-    // If the selected list is the same as the one being displayed, hide details
     if (selectedList === listName) {
       setSelectedList(null);
-      setDetailsLoading(false); // Set details loading to false when hiding details
+      setDetailsLoading(false);
     } else {
-      // Set the selected list for display
       setSelectedList(listName);
 
-      // Fetch detailed information about the selected list
       axios
-        .get(`http://localhost:4000/api/lists/${listName}`)
+        .get(`/api/lists/${listName}`)
         .then((response) => {
           setListDetails((prevDetails) => ({
             ...prevDetails,
@@ -1013,11 +1008,9 @@ function MyCurrentLists() {
           console.error('Error fetching list details:', error);
         })
         .finally(() => {
-          // Set details loading to false after fetching is complete
           setDetailsLoading(false);
         });
 
-      // Fetch heroes from the selected list
       fetchHeroes(listName);
     }
   };
@@ -1028,8 +1021,7 @@ function MyCurrentLists() {
 
   const handleDeleteList = async (listName) => {
     try {
-      await axios.delete(`http://localhost:4000/api/lists/${listName}`);
-      // After successfully deleting the list, update the userLists state
+      await axios.delete(`/api/lists/${listName}`);
       setUserLists((prevUserLists) => prevUserLists.filter((name) => name !== listName));
     } catch (error) {
       console.error(`Error deleting list ${listName}:`, error);
@@ -1043,7 +1035,6 @@ function MyCurrentLists() {
           <Text fontWeight="bold" fontSize="xl">
             List Name: {listName}
           </Text>
-          {/* Display Created by and Date Modified information if available */}
           <Text>
             Created by: {listDetails[listName]?.created_by || 'Not available'}
           </Text>
@@ -1055,14 +1046,12 @@ function MyCurrentLists() {
           </Button>
 
           <Button size="sm" onClick={() => handleMakePrivate(listName)} mt={2}>
-          Make Private
+            Make Private
           </Button>
 
           <Button size="sm" onClick={() => handleMakePublic(listName)} mt={2}>
-          Make Public
+            Make Public
           </Button>
-
-
 
           <Button size="sm" onClick={() => handleDeleteList(listName)} mt={2}>
             Delete
@@ -1077,16 +1066,13 @@ function MyCurrentLists() {
                 <span style={{ fontWeight: 'bold' }}>Description:</span>{' '}
                 {listDetails[listName].description}
               </Text>
-              
               {listDetails[listName].heroes && (
                 <>
-                  
                   {listDetails[listName].heroes.map((hero) => (
                     <Flex key={hero.info.id} flexDirection="column" mt={2}>
                       <Text>
                         <span style={{ fontWeight: 'bold' }}>Name:</span> {hero.info.name}
                       </Text>
-                  
                       <Text>
                         <span style={{ fontWeight: 'bold' }}>Publisher:</span>{' '}
                         {hero.info.Publisher}
@@ -1095,7 +1081,6 @@ function MyCurrentLists() {
                         <span style={{ fontWeight: 'bold' }}>Powers:</span>{' '}
                         {hero.info.powers.join(', ')}
                       </Text>
-                      {/* Display other hero information as needed */}
                       <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
                     </Flex>
                   ))}
@@ -1108,6 +1093,7 @@ function MyCurrentLists() {
     </Flex>
   );
 }
+
 
 
 
@@ -1141,19 +1127,15 @@ function ViewPublicLists() {
   const [listDetails, setListDetails] = useState({});
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [isCommentModalOpen, setCommentModalOpen] = useState(false);
-  const [commentInput, setCommentInput] = useState(''); // New state variable
+  const [commentInput, setCommentInput] = useState('');
   const [isCommentsModalOpen, setCommentsModalOpen] = useState(false);
   const [fetchedComments, setFetchedComments] = useState([]);
   const { user } = useAuth();
   const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
-  
-
-
-
 
   const fetchDateModified = (listName) => {
     axios
-      .get(`http://localhost:4000/api/lists/${listName}/date_modified`)
+      .get(`/api/lists/${listName}/date_modified`)
       .then((dateModifiedResponse) => {
         setListDetails((prevDetails) => ({
           ...prevDetails,
@@ -1170,7 +1152,7 @@ function ViewPublicLists() {
 
   const fetchCreatedBy = (listName) => {
     axios
-      .get(`http://localhost:4000/api/lists/${listName}/created_by`)
+      .get(`/api/lists/${listName}/created_by`)
       .then((createdByResponse) => {
         setListDetails((prevDetails) => ({
           ...prevDetails,
@@ -1188,11 +1170,11 @@ function ViewPublicLists() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/lists');
+        const response = await axios.get('/api/lists');
         const visibleLists = [];
 
         for (const listName of response.data) {
-          const visibilityResponse = await axios.get(`http://localhost:4000/api/lists/${listName}/visibility`);
+          const visibilityResponse = await axios.get(`/api/lists/${listName}/visibility`);
           if (visibilityResponse.data.isVisible) {
             visibleLists.push(listName);
           }
@@ -1201,7 +1183,7 @@ function ViewPublicLists() {
         setLists(visibleLists);
 
         const detailRequests = visibleLists.map((listName) =>
-          axios.get(`http://localhost:4000/api/lists/${listName}`)
+          axios.get(`/api/lists/${listName}`)
         );
 
         const detailResponses = await Promise.all(detailRequests);
@@ -1246,7 +1228,7 @@ function ViewPublicLists() {
       setSelectedList(listName);
 
       axios
-        .get(`http://localhost:4000/api/lists/${listName}`)
+        .get(`/api/lists/${listName}`)
         .then((response) => {
           setListDetails((prevDetails) => ({
             ...prevDetails,
@@ -1254,7 +1236,7 @@ function ViewPublicLists() {
           }));
 
           axios
-            .get(`http://localhost:4000/api/lists/${listName}/heroes`)
+            .get(`/api/lists/${listName}/heroes`)
             .then((heroesResponse) => {
               setListDetails((prevDetails) => ({
                 ...prevDetails,
@@ -1283,51 +1265,38 @@ function ViewPublicLists() {
   };
 
   const handleAddComment = () => {
-    // Make sure there's a selected list
     if (!selectedList) {
       console.error('No selected list to add comment to');
       return;
     }
-  
-    // Make a request to the API endpoint to add a comment
+
     axios
-      .put(`http://localhost:4000/api/lists/${selectedList}/comments`, {
+      .put(`/api/lists/${selectedList}/comments`, {
         comment: `${user.username} commented: ${commentInput}`,
       })
       .then((response) => {
-        // Successfully added comment, update the UI or take other actions as needed
         console.log(response.data);
-        
-        // Close the modal after adding the comment
         setCommentModalOpen(false);
-  
-        // You might want to refetch the data or update the state to reflect the new comment
-        // Example: refetchData();
       })
       .catch((error) => {
         console.error('Error adding comment:', error);
       });
   };
-  // Function to handle opening and closing of the comment modal
+
   const handleCommentModalToggle = () => {
     setCommentModalOpen(!isCommentModalOpen);
-  };  
+  };
 
   const handleViewCommentsToggle = () => {
-    // Make sure there's a selected list
     if (!selectedList) {
       console.error('No selected list to view comments');
       return;
     }
-  
-    // Fetch comments for the selected list
+
     axios
-      .get(`http://localhost:4000/api/lists/${selectedList}/comments`)
+      .get(`/api/lists/${selectedList}/comments`)
       .then((response) => {
-        // Successfully fetched comments, update the UI
         setFetchedComments(response.data.comments);
-  
-        // Open the comments modal
         setCommentsModalOpen(true);
       })
       .catch((error) => {
@@ -1336,44 +1305,31 @@ function ViewPublicLists() {
   };
 
   const handleDeleteComment = (index) => {
-    // Make sure there's a selected list
     if (!selectedList) {
       console.error('No selected list to update comment visibility');
       return;
     }
-  
-    // Make a request to the API endpoint to update the visibility of a comment
+
     axios
-      .put(`http://localhost:4000/api/lists/${selectedList}/comments/${index}/visibility`, { visibility: false })
+      .put(`/api/lists/${selectedList}/comments/${index}/visibility`, { visibility: false })
       .then((response) => {
-        // Successfully updated comment visibility, update the UI or take other actions as needed
         console.log(response.data);
-  
-        // You might want to refetch the data or update the state to reflect the updated comment visibility
-        // Example: refetchData();
       })
       .catch((error) => {
         console.error('Error updating comment visibility:', error);
       });
   };
 
-
   const handleShowComment = (index) => {
-    // Make sure there's a selected list
     if (!selectedList) {
       console.error('No selected list to update comment visibility');
       return;
     }
 
-    // Make a request to the API endpoint to update the visibility of a comment to true
     axios
-      .put(`http://localhost:4000/api/lists/${selectedList}/comments/${index}/visibility/true`)
+      .put(`/api/lists/${selectedList}/comments/${index}/visibility/true`)
       .then((response) => {
-        // Successfully updated comment visibility, update the UI or take other actions as needed
         console.log(response.data);
-
-        // You might want to refetch the data or update the state to reflect the updated comment visibility
-        // Example: refetchData();
       })
       .catch((error) => {
         console.error('Error updating comment visibility:', error);
@@ -1382,32 +1338,31 @@ function ViewPublicLists() {
 
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
-    {sortedLists.map((listName) => (
-      <Flex key={listName} flexDirection="column" mt={4}>
-        <Text fontWeight="bold" fontSize="xl">
-          List Name: {listName}
-        </Text>
-        <Text>
-          Created by: {listDetails[listName]?.created_by || 'Not available'}
-        </Text>
-        <Text>
-          Date Modified: {listDetails[listName]?.date_modified || 'Not available'}
-        </Text>
-        <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
-          {selectedList === listName ? 'Hide Details' : 'View Details'}
-        </Button>
-        {selectedList === listName && (
-          <>
-            {/* Button to open the "Add Comment" modal */}
-            <Button size="sm" onClick={handleCommentModalToggle} mt={2}>
-              Add Comment
-            </Button>
+      {sortedLists.map((listName) => (
+        <Flex key={listName} flexDirection="column" mt={4}>
+          <Text fontWeight="bold" fontSize="xl">
+            List Name: {listName}
+          </Text>
+          <Text>
+            Created by: {listDetails[listName]?.created_by || 'Not available'}
+          </Text>
+          <Text>
+            Date Modified: {listDetails[listName]?.date_modified || 'Not available'}
+          </Text>
+          <Button size="sm" onClick={() => handleViewMore(listName)} mt={2}>
+            {selectedList === listName ? 'Hide Details' : 'View Details'}
+          </Button>
+          {selectedList === listName && (
+            <>
+              <Button size="sm" onClick={handleCommentModalToggle} mt={2}>
+                Add Comment
+              </Button>
 
-            <Button size="sm" onClick={handleViewCommentsToggle} mt={2}>
-              View Comments
-            </Button>
-          </>
-        )}
+              <Button size="sm" onClick={handleViewCommentsToggle} mt={2}>
+                View Comments
+              </Button>
+            </>
+          )}
 
           {selectedList === listName && listDetails[listName] && !detailsLoading && (
             <Flex flexDirection="column" mt={2}>
@@ -1436,75 +1391,71 @@ function ViewPublicLists() {
                     <hr style={{ borderTop: '1px solid #ddd', margin: '10px 0' }} />
                   </Flex>
                 ))}
-                 {/* Modal component for adding comments */}
-                <Modal isOpen={isCommentModalOpen} onClose={handleCommentModalToggle} size="xl">
-                  <ModalOverlay />
-                  <ModalContent>
-                    <ModalHeader>Add Comment</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                      {/* Add your comment input */}
-                      <textarea
-                        value={commentInput}
-                        onChange={(e) => setCommentInput(e.target.value)}
-                        placeholder=" Type your comment here"
-                        style={{ width: '100%', height: '100px' }}
-                      />
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button colorScheme="teal" mr={3} onClick={handleAddComment}>
-                        Add Comment
-                      </Button>
-                      <Button colorScheme="red" onClick={handleCommentModalToggle}>
-                        Cancel
-                      </Button>
-                    </ModalFooter>
-                  </ModalContent>
-                </Modal>
-                {/* Modal component for viewing comments */}
+              <Modal isOpen={isCommentModalOpen} onClose={handleCommentModalToggle} size="xl">
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Add Comment</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <textarea
+                      value={commentInput}
+                      onChange={(e) => setCommentInput(e.target.value)}
+                      placeholder=" Type your comment here"
+                      style={{ width: '100%', height: '100px' }}
+                    />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button colorScheme="teal" mr={3} onClick={handleAddComment}>
+                      Add Comment
+                    </Button>
+                    <Button colorScheme="red" onClick={handleCommentModalToggle}>
+                      Cancel
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
               <Modal isOpen={isCommentsModalOpen} onClose={() => setCommentsModalOpen(false)} size="full">
                 <ModalOverlay />
                 <ModalContent>
                   <ModalHeader>View Comments</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody>
-                {/* Display fetched comments here */}
-                {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
-                  fetchedComments
-                    .filter((comment) => (isAdminUser || comment.visibility) ? comment : null)
-                    .map((comment, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          borderBottom: '1px solid #f5f5f5',
-                          padding: '10px 0',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <div>{comment.text}</div>
-                        {isAdminUser && (
-                          <div>
-                            <Button
-                              colorScheme="red"
-                              onClick={() => handleDeleteComment(index, false)}
-                              mr={2}
-                            >
-                              Hide
-                            </Button>
-                            <Button
-                              colorScheme="green"
-                              onClick={() => handleShowComment(index)}
-                            >
-                              Show
-                            </Button>
+                    {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
+                      fetchedComments
+                        .filter((comment) => (isAdminUser || comment.visibility) ? comment : null)
+                        .map((comment, index) => (
+                          <div
+                            key={index}
+                            style={{
+                              borderBottom: '1px solid #f5f5f5',
+                              padding: '10px 0',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <div>{comment.text}</div>
+                            {isAdminUser && (
+                              <div>
+                                <Button
+                                  colorScheme="red"
+                                  onClick={() => handleDeleteComment(index, false)}
+                                  mr={2}
+                                >
+                                  Hide
+                                </Button>
+                                <Button
+                                  colorScheme="green"
+                                  onClick={() => handleShowComment(index)}
+                                >
+                                  Show
+                                </Button>
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    ))
-                ) : (
-                  <div>No comments available</div>
-                )}
+                        ))
+                    ) : (
+                      <div>No comments available</div>
+                    )}
                   </ModalBody>
                   <ModalFooter>
                     <Button colorScheme="teal" onClick={() => setCommentsModalOpen(false)}>
