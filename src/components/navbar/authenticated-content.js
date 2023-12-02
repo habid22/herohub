@@ -1335,7 +1335,28 @@ function ViewPublicLists() {
       });
   };
 
+  const handleDeleteComment = (index) => {
+    // Make sure there's a selected list
+    if (!selectedList) {
+      console.error('No selected list to delete comment from');
+      return;
+    }
   
+    // Make a request to the API endpoint to delete a comment
+    axios
+      .delete(`http://localhost:4000/api/lists/${selectedList}/comments/${index}`)
+      .then((response) => {
+        // Successfully deleted comment, update the UI or take other actions as needed
+        console.log(response.data);
+  
+        // You might want to refetch the data or update the state to reflect the deleted comment
+        // Example: refetchData();
+      })
+      .catch((error) => {
+        console.error('Error deleting comment:', error);
+      });
+  }
+
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
     {sortedLists.map((listName) => (
