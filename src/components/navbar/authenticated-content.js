@@ -1338,24 +1338,24 @@ function ViewPublicLists() {
   const handleDeleteComment = (index) => {
     // Make sure there's a selected list
     if (!selectedList) {
-      console.error('No selected list to delete comment from');
+      console.error('No selected list to update comment visibility');
       return;
     }
   
-    // Make a request to the API endpoint to delete a comment
+    // Make a request to the API endpoint to update the visibility of a comment
     axios
-      .delete(`http://localhost:4000/api/lists/${selectedList}/comments/${index}`)
+      .put(`http://localhost:4000/api/lists/${selectedList}/comments/${index}/visibility`, { visibility: false })
       .then((response) => {
-        // Successfully deleted comment, update the UI or take other actions as needed
+        // Successfully updated comment visibility, update the UI or take other actions as needed
         console.log(response.data);
   
-        // You might want to refetch the data or update the state to reflect the deleted comment
+        // You might want to refetch the data or update the state to reflect the updated comment visibility
         // Example: refetchData();
       })
       .catch((error) => {
-        console.error('Error deleting comment:', error);
+        console.error('Error updating comment visibility:', error);
       });
-  }
+  };
 
   return (
     <Flex flexDirection="column" width="100%" mb={4}>
@@ -1439,7 +1439,7 @@ function ViewPublicLists() {
                   </ModalContent>
                 </Modal>
                 {/* Modal component for viewing comments */}
-                <Modal isOpen={isCommentsModalOpen} onClose={() => setCommentsModalOpen(false)}  size="full">
+              <Modal isOpen={isCommentsModalOpen} onClose={() => setCommentsModalOpen(false)} size="full">
                 <ModalOverlay />
                 <ModalContent>
                   <ModalHeader>View Comments</ModalHeader>
@@ -1447,16 +1447,26 @@ function ViewPublicLists() {
                   <ModalBody>
                     {/* Display fetched comments here */}
                     {Array.isArray(fetchedComments) && fetchedComments.length > 0 ? (
-                      fetchedComments.map((comment, index) => (
-                        <div key={index} style={{ borderBottom: '1px solid #f5f5f5', padding: '10px 0', display: 'flex', justifyContent: 'space-between' }}>
-                          <div>{comment.text}</div>
-                          {isAdminUser && (
-                            <Button colorScheme="red" onClick={() => handleDeleteComment(index)}>
-                              Delete
-                            </Button>
-                          )}
-                        </div>
-                      ))
+                      fetchedComments
+                        .filter((comment) => (isAdminUser || comment.visibility) ? comment : null)
+                        .map((comment, index) => (
+                          <div
+                            key={index}
+                            style={{
+                              borderBottom: '1px solid #f5f5f5',
+                              padding: '10px 0',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <div>{comment.text}</div>
+                            {isAdminUser && (
+                              <Button colorScheme="red" onClick={() => handleDeleteComment(index)}>
+                                Hide
+                              </Button>
+                            )}
+                          </div>
+                        ))
                     ) : (
                       <div>No comments available</div>
                     )}

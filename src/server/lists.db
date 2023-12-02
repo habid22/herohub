@@ -12,7 +12,7 @@
     "comments": [
       {
         "text": "habid22 commented: commenta",
-        "visibility": true
+        "visibility": false
       },
       {
         "text": "habid22 commented: This is a test comment!",
@@ -116,11 +116,15 @@
       },
       {
         "text": "habid22 commented: I de-activated your account!",
-        "visibility": true
+        "visibility": false
       },
       {
         "text": "habid22 commented: Can you see this?",
-        "visibility": true
+        "visibility": false
+      },
+      {
+        "text": "habid22 commented: This is a new comment!",
+        "visibility": false
       }
     ]
   }

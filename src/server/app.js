@@ -663,6 +663,33 @@ app.get('/api/lists/:name/comments', (req, res) => {
 
 
 
+// Endpoint to set the visibility of a comment in a specific list
+app.put('/api/lists/:listName/comments/:commentIndex/visibility', (req, res) => {
+  const { listName, commentIndex } = req.params;
+
+  const lists = readListsFromFile();
+
+  if (!lists[listName]) {
+    return res.status(404).send('List not found');
+  }
+
+  const comments = lists[listName].comments;
+
+  if (!Array.isArray(comments) || commentIndex < 0 || commentIndex >= comments.length) {
+    return res.status(404).send('Comment not found');
+  }
+
+  // Set the visibility of the comment to false
+  comments[commentIndex].visibility = false;
+
+  // Write the updated lists to the file without updating date_modified
+  writeListsToFile(lists);
+
+  res.send(`Visibility of comment at index ${commentIndex} in ${listName} set to false`);
+});
+
+
+
 
 
 
