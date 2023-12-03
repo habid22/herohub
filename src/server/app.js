@@ -278,54 +278,55 @@ function getSuperheroInfoById(id) {
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 app.get('/api/superheroes/multi-search', (req, res) => {
-    const { name, race, power, publisher } = req.query;
-  
-    // Sanitize user input
-    const sanitizedName = sanitizeInput(name);
-    const sanitizedRace = sanitizeInput(race);
-    const sanitizedPower = sanitizeInput(power);
-    const sanitizedPublisher = sanitizeInput(publisher);
-  
-    // Retrieve superheroes based on each criterion
-    const superheroesByName = getSuperheroesByNameWithPowers(sanitizedName);
-    const superheroesByRace = getSuperheroesByRaceWithPowers(sanitizedRace);
-    const superheroesByPower = getSuperheroesByPowerWithPowers(sanitizedPower);
-    const superheroesByPublisher = getSuperheroesByPublisherWithPowers(sanitizedPublisher);
-  
-    // Find common superheroes based on multiple criteria
-    const commonSuperheroes = findCommonSuperheroes([
-      superheroesByName,
-      superheroesByRace,
-      superheroesByPower,
-      superheroesByPublisher,
-    ]);
-  
-    // Check if any common superheroes were found
-    if (commonSuperheroes.length === 0) {
-      return res.status(404).json({ error: 'No superheroes found with the specified criteria' });
-    }
-  
-    res.json(commonSuperheroes);
-  });
-  
-  // Helper function to find common superheroes based on multiple criteria
-  function findCommonSuperheroes(superheroesArrays) {
-    if (superheroesArrays.length === 0) {
-      return [];
-    }
-  
-    // Use the first array as the base and filter based on other arrays
-    const commonSuperheroes = superheroesArrays[0].filter((hero) => {
-      for (let i = 1; i < superheroesArrays.length; i++) {
-        if (!superheroesArrays[i].some((commonHero) => commonHero.name === hero.name)) {
-          return false;
-        }
-      }
-      return true;
-    });
-  
-    return commonSuperheroes;
+  const { name, race, power, publisher } = req.query;
+
+  // Sanitize user input and trim whitespace
+  const sanitizedName = sanitizeInput(name).trim();
+  const sanitizedRace = sanitizeInput(race).trim();
+  const sanitizedPower = sanitizeInput(power).trim();
+  const sanitizedPublisher = sanitizeInput(publisher).trim();
+
+  // Retrieve superheroes based on each criterion
+  const superheroesByName = getSuperheroesByNameWithPowers(sanitizedName);
+  const superheroesByRace = getSuperheroesByRaceWithPowers(sanitizedRace);
+  const superheroesByPower = getSuperheroesByPowerWithPowers(sanitizedPower);
+  const superheroesByPublisher = getSuperheroesByPublisherWithPowers(sanitizedPublisher);
+
+  // Find common superheroes based on multiple criteria
+  const commonSuperheroes = findCommonSuperheroes([
+    superheroesByName,
+    superheroesByRace,
+    superheroesByPower,
+    superheroesByPublisher,
+  ]);
+
+  // Check if any common superheroes were found
+  if (commonSuperheroes.length === 0) {
+    return res.status(404).json({ error: 'No superheroes found with the specified criteria' });
   }
+
+  res.json(commonSuperheroes);
+});
+
+// Helper function to find common superheroes based on multiple criteria
+function findCommonSuperheroes(superheroesArrays) {
+  if (superheroesArrays.length === 0) {
+    return [];
+  }
+
+  // Use the first array as the base and filter based on other arrays
+  const commonSuperheroes = superheroesArrays[0].filter((hero) => {
+    for (let i = 1; i < superheroesArrays.length; i++) {
+      if (!superheroesArrays[i].some((commonHero) => commonHero.name.toLowerCase().includes(hero.name.toLowerCase()))) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  return commonSuperheroes;
+}
+
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // LISTS ENDPOINTS
 
