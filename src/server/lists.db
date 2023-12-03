@@ -88,7 +88,7 @@
     ],
     "created_by": "gamerboy",
     "description": "Hey!",
-    "date_modified": "2023-12-02",
+    "date_modified": "2023-12-03",
     "isVisible": true,
     "comments": [
       {
@@ -110,6 +110,10 @@
       {
         "text": "habid22 commented: This is a new comment!",
         "visibility": false
+      },
+      {
+        "text": "gamerboy commented: im testing comment functionality ",
+        "visibility": true
       }
     ]
   },
