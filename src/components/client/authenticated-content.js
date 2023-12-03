@@ -309,12 +309,20 @@ function HeroSearchContainer() {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get('/api/superheroes/multi-search', {
-        params: searchParams,
-      });
+      const queryParams = new URLSearchParams(searchParams).toString();
+      const url = `/api/superheroes/multi-search?${queryParams}`;
+  
+      const response = await fetch(url);
+  
+      if (!response.ok) {
+        // Handle non-successful response
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
   
       // Set the search results in the state
-      setSearchResults(response.data);
+      setSearchResults(data);
   
       // Update searchClicked to true
       setSearchClicked(true);
@@ -323,13 +331,14 @@ function HeroSearchContainer() {
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
-        description: "An error occurred while fetching superhero data.",
+        description: "Search fields do not match any superheroes. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
       });
     }
   };
+  
   
 
   return (
@@ -515,21 +524,35 @@ function CreateList() {
   const handleCreateList = async () => {
     try {
       console.log('Request Data:', listParams);
-      const response = await axios.post("http://localhost:4000/api/lists", listParams);
-
+  
+      const response = await fetch("/api/lists", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any additional headers if needed
+        },
+        body: JSON.stringify(listParams),
+      });
+  
+      if (!response.ok) {
+        // Handle non-successful response
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
       setListCreated(true);
-
+  
       toast({
         title: "Success",
-        description: response.data.message,
+        description: data.message,
         status: "success",
         duration: 5000,
         isClosable: true,
       });
     } catch (error) {
       console.error("Error creating list:", error);
-      console.log('Server response:', error.response);
-
+  
       toast({
         title: "Error",
         description: "An error occurred while creating the list.",
@@ -619,18 +642,23 @@ function AddToList() {
   useEffect(() => {
     const fetchUserLists = async () => {
       try {
-        const response = await axios.get(`/api/lists/created_by/${user.username}`);
-        setUserLists(response.data);
+        const response = await fetch(`/api/lists/created_by/${user.username}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        setUserLists(data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
-
+  
     if (user) {
       fetchUserLists();
     }
   }, [user]);
-
+  
   const handleAddHeroToList = async () => {
     try {
       if (!selectedList || !heroId) {
@@ -644,12 +672,18 @@ function AddToList() {
         return;
       }
 
-      const response = await axios.put(`/api/lists/${encodeURIComponent(selectedList)}`, {
-        superheroIds: [parseInt(heroId, 10)], // Ensure heroId is parsed as an integer
+      const response = await fetch(`/api/lists/${encodeURIComponent(selectedList)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          superheroIds: [parseInt(heroId, 10)], // Ensure heroId is parsed as an integer
+        }),
       });
 
       toast({
-        title: "Success",
+        title: "Successfully added Superhero to the List!",
         description: response.data,
         status: "success",
         duration: 5000,
@@ -708,17 +742,26 @@ function UpdateDescriptionList() {
   useEffect(() => {
     const fetchUserLists = async () => {
       try {
-        const response = await axios.get(`/api/lists/created_by/${user.username}`);
-        setUserLists(response.data);
+        if (!user) return; // Ensure user is not null or undefined
+  
+        const response = await fetch(`/api/lists/created_by/${user.username}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user lists. Status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        setUserLists(data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
-
+  
     if (user) {
       fetchUserLists();
     }
   }, [user]);
+  
 
   const handleUpdateDescription = async () => {
     try {
@@ -733,16 +776,32 @@ function UpdateDescriptionList() {
         return;
       }
 
-      const response = await axios.patch(
-        `/api/lists/${encodeURIComponent(selectedList)}/description`,
-        {
+      const response = await fetch(`/api/lists/${encodeURIComponent(selectedList)}/description`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           description: newDescription,
+        }),
+      });
+      
+      try {
+        if (!response.ok) {
+          throw new Error(`Failed to update list description. Status: ${response.status}`);
         }
-      );
+      
+        const responseData = await response.json();
+        // Handle success, if necessary
+      } catch (error) {
+        console.error("Error updating list description:", error);
+        // Handle error, if necessary
+      }
+      
 
       toast({
         title: "Success",
-        description: response.data,
+        description: "Successfully updated list description!",
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -800,17 +859,26 @@ function DeleteFromList() {
   useEffect(() => {
     const fetchUserLists = async () => {
       try {
-        const response = await axios.get(`/api/lists/created_by/${user.username}`);
-        setUserLists(response.data);
+        if (!user) return; // Ensure user is not null or undefined
+  
+        const response = await fetch(`/api/lists/created_by/${user.username}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user lists. Status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        setUserLists(data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
-
+  
     if (user) {
       fetchUserLists();
     }
   }, [user]);
+  
 
   const handleDeleteHeroFromList = async () => {
     try {
@@ -825,13 +893,19 @@ function DeleteFromList() {
         return;
       }
 
-      const response = await axios.delete(
-        `/api/lists/${encodeURIComponent(selectedList)}/heroes/${encodeURIComponent(heroName)}`
+      const response = await fetch(
+        `/api/lists/${encodeURIComponent(selectedList)}/heroes/${encodeURIComponent(heroName)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
       );
 
       toast({
         title: "Success",
-        description: response.data,
+        description: "Successfully deleted hero from list!",
         status: "success",
         duration: 5000,
         isClosable: true,

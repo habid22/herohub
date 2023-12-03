@@ -14,14 +14,19 @@ export default function MyCurrentLists() {
 
   
     const fetchDateModified = (listName) => {
-      axios
-        .get(`/api/lists/${listName}/date_modified`)
+      fetch(`/api/lists/${listName}/date_modified`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then((dateModifiedResponse) => {
           setListDetails((prevDetails) => ({
             ...prevDetails,
             [listName]: {
               ...prevDetails[listName],
-              date_modified: dateModifiedResponse.data.date_modified,
+              date_modified: dateModifiedResponse.date_modified,
             },
           }));
         })
@@ -31,14 +36,19 @@ export default function MyCurrentLists() {
     };
   
     const fetchCreatedBy = (listName) => {
-      axios
-        .get(`/api/lists/${listName}/created_by`)
+      fetch(`/api/lists/${listName}/created_by`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then((createdByResponse) => {
           setListDetails((prevDetails) => ({
             ...prevDetails,
             [listName]: {
               ...prevDetails[listName],
-              created_by: createdByResponse.data.created_by,
+              created_by: createdByResponse.created_by,
             },
           }));
         })
@@ -46,16 +56,22 @@ export default function MyCurrentLists() {
           console.error('Error fetching created_by:', error);
         });
     };
+    
   
     const fetchHeroes = (listName) => {
-      axios
-        .get(`/api/lists/${listName}/heroes`)
-        .then((heroesResponse) => {
+      fetch(`/api/lists/${listName}/heroes`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((heroesData) => {
           setListDetails((prevDetails) => ({
             ...prevDetails,
             [listName]: {
               ...prevDetails[listName],
-              heroes: heroesResponse.data,
+              heroes: heroesData,
             },
           }));
         })
@@ -66,10 +82,14 @@ export default function MyCurrentLists() {
   
     const handleMakePrivate = async (listName) => {
       try {
-        await axios.patch(`/api/lists/${listName}/visibilityFalse`, {
-          isVisible: false,
+        await fetch(`/api/lists/${listName}/visibilityFalse`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ isVisible: false }),
         });
-  
+    
         setUserLists((prevUserLists) =>
           prevUserLists.map((name) => (name === listName ? `${name} (Private)` : name))
         );
@@ -81,8 +101,12 @@ export default function MyCurrentLists() {
   
     const handleMakePublic = async (listName) => {
       try {
-        await axios.patch(`/api/lists/${listName}/visibilityTrue`, {
-          isVisible: true,
+        await fetch(`/api/lists/${listName}/visibilityTrue`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ isVisible: true }),
         });
   
         setUserLists((prevUserLists) =>
@@ -97,8 +121,9 @@ export default function MyCurrentLists() {
     useEffect(() => {
       const fetchUserLists = async () => {
         try {
-          const response = await axios.get(`/api/lists/created_by/${user.username}`);
-          setUserLists(response.data);
+          const response = await fetch(`/api/lists/created_by/${user.username}`);
+          const data = await response.json();
+          setUserLists(data);
         } catch (error) {
           console.error("Error fetching user lists:", error);
         }
@@ -121,44 +146,47 @@ export default function MyCurrentLists() {
   
     const handleViewMore = (listName) => {
       setDetailsLoading(true);
-  
-      if (selectedList === listName) {
-        setSelectedList(null);
+
+  if (selectedList === listName) {
+    setSelectedList(null);
+    setDetailsLoading(false);
+  } else {
+    setSelectedList(listName);
+
+    fetch(`/api/lists/${listName}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setListDetails((prevDetails) => ({
+          ...prevDetails,
+          [listName]: data,
+        }));
+      })
+      .catch((error) => {
+        console.error('Error fetching list details:', error);
+      })
+      .finally(() => {
         setDetailsLoading(false);
-      } else {
-        setSelectedList(listName);
-  
-        axios
-          .get(`/api/lists/${listName}`)
-          .then((response) => {
-            setListDetails((prevDetails) => ({
-              ...prevDetails,
-              [listName]: response.data,
-            }));
-          })
-          .catch((error) => {
-            console.error('Error fetching list details:', error);
-          })
-          .finally(() => {
-            setDetailsLoading(false);
-          });
-  
-        fetchHeroes(listName);
-      }
-    };
-  
-    const handleHideDetails = () => {
-      setSelectedList(null);
-    };
-  
-    const handleDeleteList = async (listName) => {
-      try {
-        await axios.delete(`/api/lists/${listName}`);
-        setUserLists((prevUserLists) => prevUserLists.filter((name) => name !== listName));
-      } catch (error) {
-        console.error(`Error deleting list ${listName}:`, error);
-      }
-    };
+      });
+
+    fetchHeroes(listName);
+  }
+
+  };
+
+  const handleHideDetails = () => {
+    setSelectedList(null);
+  };
+
+  const handleDeleteList = async (listName) => {
+    try {
+      await fetch(`/api/lists/${listName}`, {
+        method: 'DELETE',
+      });
+      setUserLists((prevUserLists) => prevUserLists.filter((name) => name !== listName));
+    } catch (error) {
+      console.error(`Error deleting list ${listName}:`, error);
+    }
+  };
   
     return (
       <Flex flexDirection="column" width="100%" mb={4}>

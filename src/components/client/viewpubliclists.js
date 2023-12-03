@@ -22,14 +22,19 @@ export default function ViewPublicLists() {
     const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
   
     const fetchDateModified = (listName) => {
-      axios
-        .get(`/api/lists/${listName}/date_modified`)
+      fetch(`/api/lists/${listName}/date_modified`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then((dateModifiedResponse) => {
           setListDetails((prevDetails) => ({
             ...prevDetails,
             [listName]: {
               ...prevDetails[listName],
-              date_modified: dateModifiedResponse.data.date_modified,
+              date_modified: dateModifiedResponse.date_modified,
             },
           }));
         })
@@ -39,14 +44,19 @@ export default function ViewPublicLists() {
     };
   
     const fetchCreatedBy = (listName) => {
-      axios
-        .get(`/api/lists/${listName}/created_by`)
+      fetch(`/api/lists/${listName}/created_by`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then((createdByResponse) => {
           setListDetails((prevDetails) => ({
             ...prevDetails,
             [listName]: {
               ...prevDetails[listName],
-              created_by: createdByResponse.data.created_by,
+              created_by: createdByResponse.created_by,
             },
           }));
         })
@@ -54,41 +64,56 @@ export default function ViewPublicLists() {
           console.error('Error fetching created_by:', error);
         });
     };
+    
   
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.get('/api/lists');
+          const response = await fetch('/api/lists');
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+    
+          const data = await response.json();
           const visibleLists = [];
-  
-          for (const listName of response.data) {
-            const visibilityResponse = await axios.get(`/api/lists/${listName}/visibility`);
-            if (visibilityResponse.data.isVisible) {
+    
+          for (const listName of data) {
+            const visibilityResponse = await fetch(`/api/lists/${listName}/visibility`);
+            if (!visibilityResponse.ok) {
+              throw new Error(`HTTP error! Status: ${visibilityResponse.status}`);
+            }
+    
+            const visibilityData = await visibilityResponse.json();
+            if (visibilityData.isVisible) {
               visibleLists.push(listName);
             }
           }
-  
+    
           setLists(visibleLists);
-  
-          const detailRequests = visibleLists.map((listName) =>
-            axios.get(`/api/lists/${listName}`)
-          );
-  
+    
+          const detailRequests = visibleLists.map((listName) => fetch(`/api/lists/${listName}`));
+    
           const detailResponses = await Promise.all(detailRequests);
-  
+    
           const detailsMap = {};
-          detailResponses.forEach((response, index) => {
-            detailsMap[response.data.listName] = response.data;
-          });
-  
+          for (const response of detailResponses) {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const detailData = await response.json();
+            detailsMap[detailData.listName] = detailData;
+          }
+    
           setListDetails(detailsMap);
         } catch (error) {
           console.error('Error fetching data:', error);
         }
       };
-  
+    
       fetchData();
     }, []);
+    
   
     useEffect(() => {
       lists.forEach((listName) => {
@@ -108,68 +133,86 @@ export default function ViewPublicLists() {
   
     const handleViewMore = (listName) => {
       setDetailsLoading(true);
-  
+    
       if (selectedList === listName) {
         setSelectedList(null);
         setDetailsLoading(false);
       } else {
         setSelectedList(listName);
-  
-        axios
-          .get(`/api/lists/${listName}`)
+    
+        fetch(`/api/lists/${listName}`)
           .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((listDetails) => {
             setListDetails((prevDetails) => ({
               ...prevDetails,
-              [listName]: response.data,
+              [listName]: listDetails,
             }));
-  
-            axios
-              .get(`/api/lists/${listName}/heroes`)
-              .then((heroesResponse) => {
-                setListDetails((prevDetails) => ({
-                  ...prevDetails,
-                  [listName]: {
-                    ...prevDetails[listName],
-                    heroes: heroesResponse.data,
-                  },
-                }));
-              })
-              .catch((error) => {
-                console.error('Error fetching list heroes:', error);
-              })
-              .finally(() => {
-                setDetailsLoading(false);
-              });
+    
+            return fetch(`/api/lists/${listName}/heroes`);
+          })
+          .then((heroesResponse) => {
+            if (!heroesResponse.ok) {
+              throw new Error(`HTTP error! Status: ${heroesResponse.status}`);
+            }
+            return heroesResponse.json();
+          })
+          .then((heroesData) => {
+            setListDetails((prevDetails) => ({
+              ...prevDetails,
+              [listName]: {
+                ...prevDetails[listName],
+                heroes: heroesData,
+              },
+            }));
           })
           .catch((error) => {
-            console.error('Error fetching list details:', error);
+            console.error('Error fetching list details or heroes:', error);
+          })
+          .finally(() => {
             setDetailsLoading(false);
           });
       }
     };
+    
   
     const handleHideDetails = () => {
       setSelectedList(null);
     };
   
-    const handleAddComment = () => {
-      if (!selectedList) {
-        console.error('No selected list to add comment to');
-        return;
+   const handleAddComment = () => {
+  if (!selectedList) {
+    console.error('No selected list to add comment to');
+    return;
+  }
+
+  fetch(`/api/lists/${selectedList}/comments`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      comment: `${user.username} commented: ${commentInput}`,
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
-      axios
-        .put(`/api/lists/${selectedList}/comments`, {
-          comment: `${user.username} commented: ${commentInput}`,
-        })
-        .then((response) => {
-          console.log(response.data);
-          setCommentModalOpen(false);
-        })
-        .catch((error) => {
-          console.error('Error adding comment:', error);
-        });
-    };
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      setCommentModalOpen(false);
+    })
+    .catch((error) => {
+      console.error('Error adding comment:', error);
+    });
+};
   
     const handleCommentModalToggle = () => {
       setCommentModalOpen(!isCommentModalOpen);
@@ -180,49 +223,72 @@ export default function ViewPublicLists() {
         console.error('No selected list to view comments');
         return;
       }
-  
-      axios
-        .get(`/api/lists/${selectedList}/comments`)
+    
+      fetch(`/api/lists/${selectedList}/comments`)
         .then((response) => {
-          setFetchedComments(response.data.comments);
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setFetchedComments(data.comments);
           setCommentsModalOpen(true);
         })
         .catch((error) => {
           console.error('Error fetching comments:', error);
         });
     };
+    
   
     const handleDeleteComment = (index) => {
       if (!selectedList) {
         console.error('No selected list to update comment visibility');
         return;
       }
-  
-      axios
-        .put(`/api/lists/${selectedList}/comments/${index}/visibility`, { visibility: false })
+    
+      fetch(`/api/lists/${selectedList}/comments/${index}/visibility`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ visibility: false }),
+      })
         .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
           console.log(response.data);
         })
         .catch((error) => {
           console.error('Error updating comment visibility:', error);
         });
     };
+    
   
     const handleShowComment = (index) => {
       if (!selectedList) {
         console.error('No selected list to update comment visibility');
         return;
       }
-  
-      axios
-        .put(`/api/lists/${selectedList}/comments/${index}/visibility/true`)
+    
+      fetch(`/api/lists/${selectedList}/comments/${index}/visibility/true`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
         .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
           console.log(response.data);
         })
         .catch((error) => {
           console.error('Error updating comment visibility:', error);
         });
     };
+    
   
     return (
       <Flex flexDirection="column" width="100%" mb={4}>

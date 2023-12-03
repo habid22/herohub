@@ -585,8 +585,6 @@ app.patch('/api/lists/:name/visibilityFalse', (req, res) => {
   // Set the isVisible property to false
   lists[name].isVisible = false;
 
-  // Update the date_modified field
-  lists[name].date_modified = new Date().toISOString().split('T')[0];
 
   // Write the updated lists to the file
   writeListsToFile(lists);
@@ -606,9 +604,6 @@ app.patch('/api/lists/:name/visibilityTrue', (req, res) => {
 
   // Set the isVisible property to true
   lists[name].isVisible = true;
-
-  // Update the date_modified field
-  lists[name].date_modified = new Date().toISOString().split('T')[0];
 
   // Write the updated lists to the file
   writeListsToFile(lists);
@@ -637,9 +632,6 @@ app.put('/api/lists/:name/comments', (req, res) => {
     text: comment,
     visibility: visibility !== undefined ? visibility : true
   });
-
-  // Update the date_modified field
-  lists[name].date_modified = new Date().toISOString().split('T')[0];
 
   // Write the updated lists to the file
   writeListsToFile(lists);

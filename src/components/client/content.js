@@ -123,6 +123,7 @@ function WelcomeContainer() {
   );
 }
 
+
 function HeroSearchContainer() {
   const [searchParams, setSearchParams] = useState({
     name: "",
@@ -145,26 +146,37 @@ function HeroSearchContainer() {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/superheroes/multi-search", {
-        params: searchParams,
-      });
-
+      const queryParams = new URLSearchParams(searchParams).toString();
+      const url = `/api/superheroes/multi-search?${queryParams}`;
+  
+      const response = await fetch(url);
+  
+      if (!response.ok) {
+        // Handle non-successful response
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
       // Set the search results in the state
-      setSearchResults(response.data);
-
+      setSearchResults(data);
+  
       // Update searchClicked to true
       setSearchClicked(true);
     } catch (error) {
+      // Handle error
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
-        description: "An error occurred while fetching superhero data.",
+        description: "Search fields do not match any superheroes. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
       });
     }
   };
+  
+  
 
   return (
     <Flex
@@ -278,6 +290,10 @@ function SuperheroItem({ superhero }) {
       {showDetails && (
         <Flex flexDirection="column" mt={2}>
           <Text>
+        <span style={{ fontWeight: 'bold' }}>Superhero Number:</span> {superhero.id}
+      </Text>
+
+          <Text>
             <span style={{ fontWeight: 'bold' }}>Gender:</span> {superhero.Gender}
           </Text>
           <Text>
@@ -309,6 +325,7 @@ function SuperheroItem({ superhero }) {
     </Flex>
   );
 }
+
 
 
 function PublicLists() {
