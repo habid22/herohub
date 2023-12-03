@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import Login from '../components/auth/Login';
 import Register from '../components/auth/Register';
 import Layout from '../components/layout';
-import Content from '../components/navbar/content';
+import Content from '../components/client/content';
 import { useAuth } from '../../src/hooks/auth'; // Update the path accordingly
 
 export const ROOT = '/';

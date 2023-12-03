@@ -368,7 +368,7 @@ app.post('/api/lists', (req, res) => {
     created_by,
     description: description || '', // Optional description, default to an empty string
     date_modified: currentDate, // Add the date_modified field
-    isVisible: true, // Set isVisible to true
+    isVisible: false, // Set isVisible to false
     comments: [], // Initialize comments as an empty array
   };
 
