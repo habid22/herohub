@@ -24,14 +24,16 @@ import {
   ModalBody,
   ModalCloseButton,
   Box,
-
+  Heading,
+  List,
+  ListItem,
 } from "@chakra-ui/react";
 import { useLogout, useAuth } from "../../hooks/auth"; // Import useAuth
 import { FaSuperpowers } from "react-icons/fa";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import { db } from "../../lib/firebase";
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from "firebase/firestore";
 import { doc, updateDoc, query, where } from "firebase/firestore";
 
 // Components from other files
@@ -40,17 +42,18 @@ import MyCurrentLists from "./currentlists";
 import ViewPublicLists from "./viewpubliclists";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
-
 // Add this function inside your Header component
 const deactivateUser = async (username) => {
   try {
     // Find the user document with the given username
-    const userSnapshot = await getDocs(query(collection(db, 'users'), where('username', '==', username)));
+    const userSnapshot = await getDocs(
+      query(collection(db, "users"), where("username", "==", username))
+    );
     const userDoc = userSnapshot.docs[0];
 
     // Update the 'username' field of the user document to include "(deactivated)"
-    await updateDoc(doc(db, 'users', userDoc.id), {
-      username: `${username} (deactivated)`
+    await updateDoc(doc(db, "users", userDoc.id), {
+      username: `${username} (deactivated)`,
     });
 
     console.log(`User ${username} has been deactivated.`);
@@ -65,8 +68,13 @@ const activateUser = async (username) => {
     const deactivatedUsername = `${username} (deactivated)`;
 
     // Find the user document with the given username
-    const userSnapshot = await getDocs(query(collection(db, 'users'), where('username', '==', deactivatedUsername)));
-    
+    const userSnapshot = await getDocs(
+      query(
+        collection(db, "users"),
+        where("username", "==", deactivatedUsername)
+      )
+    );
+
     // Check if the user document exists
     if (userSnapshot.empty) {
       console.error(`No user found with the username: ${deactivatedUsername}`);
@@ -76,8 +84,8 @@ const activateUser = async (username) => {
     const userDoc = userSnapshot.docs[0];
 
     // Update the 'username' field of the user document to remove "(deactivated)"
-    await updateDoc(doc(db, 'users', userDoc.id), {
-      username: username
+    await updateDoc(doc(db, "users", userDoc.id), {
+      username: username,
     });
 
     console.log(`User ${username} has been activated.`);
@@ -88,32 +96,42 @@ const activateUser = async (username) => {
 
 export default function LogInContent() {
   return (
-  <ChakraProvider>
-    <CSSReset />
-    <ColorModeWrapper>
-    <Flex direction="column" align="center" minH="100vh">
-      <Header />
-      <WelcomeContainer />
-      <HeroSearchContainer />
-      <CreateList />
-      <ListManagement />
-      <PublicLists />
-      <Footer />
-    </Flex>
-    </ColorModeWrapper>
-  </ChakraProvider>
+    <ChakraProvider>
+      <CSSReset />
+      <ColorModeWrapper>
+        <Flex direction="column" align="center" minH="100vh">
+          <Header />
+          <WelcomeContainer />
+          <HeroSearchContainer />
+          <CreateList />
+          <ListManagement />
+          <PublicLists />
+          <Footer />
+        </Flex>
+      </ColorModeWrapper>
+    </ChakraProvider>
   );
+}
 
-  }
+const Document = ({ title, points }) => (
+  <Box mt={4}>
+    <Heading size="md">{title}</Heading>
+    <List spacing={2} mt={2}>
+      {points.map((point, index) => (
+        <ListItem key={index}>{point}</ListItem>
+      ))}
+    </List>
+  </Box>
+);
 
-  function Header() {
+function Header() {
   const { toggleColorMode, colorMode } = useColorMode();
   const { logout, isLoading } = useLogout();
   const { user } = useAuth();
   const isAdminUser = user?.email === "hassanaminsheikh@gmail.com";
   const [isAdminModalOpen, setAdminModalOpen] = useState(false);
+  const [isToolsModalOpen, setToolsModalOpen] = useState(false);
   const [usernames, setUsernames] = useState([]);
-  console.log(db)
 
   const openAdminModal = () => {
     setAdminModalOpen(true);
@@ -123,29 +141,30 @@ export default function LogInContent() {
     setAdminModalOpen(false);
   };
 
+  const openToolsModal = () => {
+    setToolsModalOpen(true);
+  };
+
+  const closeToolsModal = () => {
+    setToolsModalOpen(false);
+  };
+
   useEffect(() => {
     if (isAdminModalOpen) {
-      // Fetch usernames from Firestore and update state
       const fetchUsernames = async () => {
         try {
-          // Reference the 'users' collection
-          const usersCollection = collection(db, 'users');
-  
-          // Retrieve a snapshot of the documents in the collection
+          const usersCollection = collection(db, "users");
           const usersSnapshot = await getDocs(usersCollection);
-  
-          // Map through the documents and extract the 'username' field
           const usernamesArray = usersSnapshot.docs.map((doc) => {
             const userData = doc.data();
             return userData.username;
           });
-  
           setUsernames(usernamesArray);
         } catch (error) {
           console.error("Error fetching usernames:", error);
         }
       };
-  
+
       fetchUsernames();
     }
   }, [isAdminModalOpen]);
@@ -184,6 +203,18 @@ export default function LogInContent() {
           </Button>
         )}
 
+        {isAdminUser && (
+          <Button
+            ml="2"
+            colorScheme="teal"
+            size="sm"
+            variant="outline"
+            onClick={openToolsModal}
+          >
+            Tools
+          </Button>
+        )}
+
         <Button
           colorScheme="teal"
           size="sm"
@@ -194,7 +225,11 @@ export default function LogInContent() {
           Log Out
         </Button>
         <Button colorScheme="teal" size="sm" ml={2} onClick={toggleColorMode}>
-          {colorMode === "light" ? <MoonIcon boxSize={4} /> : <SunIcon boxSize={4} />}
+          {colorMode === "light" ? (
+            <MoonIcon boxSize={4} />
+          ) : (
+            <SunIcon boxSize={4} />
+          )}
         </Button>
       </Flex>
 
@@ -205,55 +240,114 @@ export default function LogInContent() {
           <ModalHeader>Admin Panel</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-          <Text fontWeight="bold" fontSize="xl" textAlign="center">
-          Superhero Hub Users:
-          </Text>
-          <Text >
-          <br/>
-          </Text>
-          {usernames.map((username, index) => (
-            <Box
-            key={username}
-            p={2}
-            mb={2}
-            borderRadius="md"
-            backgroundColor="teal.500"
-            color="white"
-            fontWeight="bold"
-            fontSize="lg"
-            width="30%"
-            mx="auto"
-            position="relative" // Add position relative to position the button
-          >
-            {username}
-            <Flex
-              position="absolute"
-              top="50%"
-              right="5%"
-              transform="translateY(-50%)"
-            >
-
-
-              <Button colorScheme="green" size="sm" right="5%" onClick={() => activateUser(username.replace(' (deactivated)', ''))}>
-                Activate
-              </Button>
-              <Button colorScheme="red" size="sm" onClick={() => deactivateUser(username)}>
-                Disable
-              </Button>
-            </Flex>
-          </Box>
-          ))}
-        </ModalBody>
-                  <ModalFooter>
+            <Text fontWeight="bold" fontSize="xl" textAlign="center">
+              Superhero Hub Users:
+            </Text>
+            <Text>
+              <br />
+            </Text>
+            {usernames.map((username, index) => (
+              <Box
+                key={username}
+                p={2}
+                mb={2}
+                borderRadius="md"
+                backgroundColor="teal.500"
+                color="white"
+                fontWeight="bold"
+                fontSize="lg"
+                width="30%"
+                mx="auto"
+                position="relative"
+              >
+                {username}
+                <Flex
+                  position="absolute"
+                  top="50%"
+                  right="5%"
+                  transform="translateY(-50%)"
+                >
+                  <Button
+                    colorScheme="green"
+                    size="sm"
+                    right="5%"
+                    onClick={() =>
+                      activateUser(username.replace(" (deactivated)", ""))
+                    }
+                  >
+                    Activate
+                  </Button>
+                  <Button
+                    colorScheme="red"
+                    size="sm"
+                    onClick={() => deactivateUser(username)}
+                  >
+                    Disable
+                  </Button>
+                </Flex>
+              </Box>
+            ))}
+          </ModalBody>
+          <ModalFooter>
             <Button colorScheme="teal" onClick={closeAdminModal}>
               Close
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Tools Modal */}
+      <Modal isOpen={isToolsModalOpen} onClose={closeToolsModal} size="full">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Tools</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>
+              Document to describe the workflow and usage of tools.{" "}
+              {/* 1 point */}
+            </Text>
+
+            {/* Document for DMCA notice & takedown policy */}
+            <Document
+              title="DMCA Notice & Takedown Policy Implementation"
+              points={[
+                "A document that describes the workflow for implementing DMCA notice & takedown policy is provided for the SM.",
+                "This document contains the instructions for using the tools provided for implementing the DMCA notice & takedown policy.",
+              ]}
+            />
+
+            {/* Instructions for using the tools */}
+            <Document
+              title="Instructions for Using the Tools"
+              points={[
+                "Step 1: Open the tools modal by clicking on the 'Tools' button.",
+                "Step 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "Step 3: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                // Add more steps as needed
+              ]}
+            />
+
+            <Document
+              title="DMCA Requests"
+              points={[
+                "DMCA Requests will be shown here:",
+                // Add more steps as needed
+              ]}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="teal" onClick={closeToolsModal}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+        ;
+      </Modal>
     </Flex>
   );
 }
+
 function WelcomeContainer() {
   // Use the useAuth hook to get information about the logged-in user
   const { user } = useAuth();
@@ -281,7 +375,8 @@ function WelcomeContainer() {
       )}
 
       <Text fontSize="sm" textAlign="center" mb={4}>
-        Thank you for using our service. Explore the world of superheroes and enjoy your experience on HeroHub!
+        Thank you for using our service. Explore the world of superheroes and
+        enjoy your experience on HeroHub!
       </Text>
     </Flex>
   );
@@ -311,19 +406,19 @@ function HeroSearchContainer() {
     try {
       const queryParams = new URLSearchParams(searchParams).toString();
       const url = `/api/superheroes/multi-search?${queryParams}`;
-  
+
       const response = await fetch(url);
-  
+
       if (!response.ok) {
         // Handle non-successful response
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-  
+
       // Set the search results in the state
       setSearchResults(data);
-  
+
       // Update searchClicked to true
       setSearchClicked(true);
     } catch (error) {
@@ -331,15 +426,14 @@ function HeroSearchContainer() {
       console.error("Error fetching data:", error);
       toast({
         title: "Error",
-        description: "Search fields do not match any superheroes. Please try again.",
+        description:
+          "Search fields do not match any superheroes. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
       });
     }
   };
-  
-  
 
   return (
     <Flex
@@ -390,14 +484,20 @@ function HeroSearchContainer() {
 
       {/* Display search results using the SearchResults component if search has been clicked */}
       {searchClicked && (
-        <Flex mt={4} p={4} border="1px solid teal" borderRadius="md" width="100%" direction="column">
+        <Flex
+          mt={4}
+          p={4}
+          border="1px solid teal"
+          borderRadius="md"
+          width="100%"
+          direction="column"
+        >
           <SearchResults results={searchResults} />
         </Flex>
       )}
     </Flex>
   );
 }
-
 
 // New SearchResults component with "View More" option
 function SearchResults({ results }) {
@@ -426,9 +526,9 @@ function SuperheroItem({ superhero }) {
   };
 
   const handleSearchOnDDG = () => {
-    const searchQuery = superhero.name.replace(/\s+/g, '+');
+    const searchQuery = superhero.name.replace(/\s+/g, "+");
     const searchUrl = `https://duckduckgo.com/?q=${searchQuery}`;
-    window.open(searchUrl, '_blank');
+    window.open(searchUrl, "_blank");
   };
 
   return (
@@ -438,59 +538,63 @@ function SuperheroItem({ superhero }) {
         {superhero.name}
       </Text>
 
-
       {/* Publisher line with bold font */}
       <Text>
-        <span style={{ fontWeight: 'bold' }}>Publisher:</span> {superhero.Publisher}
+        <span style={{ fontWeight: "bold" }}>Publisher:</span>{" "}
+        {superhero.Publisher}
       </Text>
 
       {/* "View More" button */}
       <Button size="sm" onClick={handleToggleDetails} mt={2}>
-        {showDetails ? 'View Less' : 'View More'}
+        {showDetails ? "View Less" : "View More"}
       </Button>
 
       {/* Additional details */}
       {showDetails && (
         <Flex flexDirection="column" mt={2}>
           <Text>
-        <span style={{ fontWeight: 'bold' }}>Superhero Number:</span> {superhero.id}
-      </Text>
+            <span style={{ fontWeight: "bold" }}>Superhero Number:</span>{" "}
+            {superhero.id}
+          </Text>
 
           <Text>
-            <span style={{ fontWeight: 'bold' }}>Gender:</span> {superhero.Gender}
+            <span style={{ fontWeight: "bold" }}>Gender:</span>{" "}
+            {superhero.Gender}
           </Text>
           <Text>
-            <span style={{ fontWeight: 'bold' }}>Eye color:</span> {superhero['Eye color']}
+            <span style={{ fontWeight: "bold" }}>Eye color:</span>{" "}
+            {superhero["Eye color"]}
           </Text>
           <Text>
-            <span style={{ fontWeight: 'bold' }}>Race:</span> {superhero.Race}
+            <span style={{ fontWeight: "bold" }}>Race:</span> {superhero.Race}
           </Text>
           <Text>
-            <span style={{ fontWeight: 'bold' }}>Hair color:</span> {superhero['Hair color']}
+            <span style={{ fontWeight: "bold" }}>Hair color:</span>{" "}
+            {superhero["Hair color"]}
           </Text>
           <Text>
-            <span style={{ fontWeight: 'bold' }}>Height:</span> {superhero.Height}
+            <span style={{ fontWeight: "bold" }}>Height:</span>{" "}
+            {superhero.Height}
           </Text>
           {/* Powers */}
           <Text>
-            <span style={{ fontWeight: 'bold' }}>Powers:</span>{' '}
-            {superhero.powers && superhero.powers.length > 0 ? superhero.powers.join(', ') : 'N/A'}
+            <span style={{ fontWeight: "bold" }}>Powers:</span>{" "}
+            {superhero.powers && superhero.powers.length > 0
+              ? superhero.powers.join(", ")
+              : "N/A"}
           </Text>
           {/* Search on DDG link */}
           <Text textAlign="center" mt={2}>
-  <Link onClick={handleSearchOnDDG} color="teal.500" cursor="pointer">
-    Open in DuckDuckGo
-  </Link>
-</Text>
+            <Link onClick={handleSearchOnDDG} color="teal.500" cursor="pointer">
+              Open in DuckDuckGo
+            </Link>
+          </Text>
           {/* Add more fields as needed */}
         </Flex>
       )}
     </Flex>
   );
 }
-
-
-
 
 function CreateList() {
   const { user } = useAuth();
@@ -523,26 +627,26 @@ function CreateList() {
 
   const handleCreateList = async () => {
     try {
-      console.log('Request Data:', listParams);
-  
+      console.log("Request Data:", listParams);
+
       const response = await fetch("/api/lists", {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           // Add any additional headers if needed
         },
         body: JSON.stringify(listParams),
       });
-  
+
       if (!response.ok) {
         // Handle non-successful response
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-  
+
       setListCreated(true);
-  
+
       toast({
         title: "Success",
         description: data.message,
@@ -552,7 +656,7 @@ function CreateList() {
       });
     } catch (error) {
       console.error("Error creating list:", error);
-  
+
       toast({
         title: "Error",
         description: "An error occurred while creating the list.",
@@ -562,7 +666,6 @@ function CreateList() {
       });
     }
   };
-
 
   return (
     <Flex
@@ -598,7 +701,6 @@ function CreateList() {
         value={listParams.description}
         width={["100%", "100%", "100%", "50%"]}
         onChange={handleInputChange}
-       
         mb={4}
       />
 
@@ -608,7 +710,14 @@ function CreateList() {
 
       {/* Display success message if the list is created */}
       {listCreated && (
-        <Flex mt={4} p={4} border="1px solid teal" borderRadius="md" width="100%" direction="column">
+        <Flex
+          mt={4}
+          p={4}
+          border="1px solid teal"
+          borderRadius="md"
+          width="100%"
+          direction="column"
+        >
           <Text fontSize="md" color="green.500">
             List created successfully!
           </Text>
@@ -620,7 +729,17 @@ function CreateList() {
 
 function ListManagement() {
   return (
-    <Flex mt={8} justify="center" align="center" direction="column" p={4} border="1px solid teal" borderRadius="md" maxW="800px" width="55%">
+    <Flex
+      mt={8}
+      justify="center"
+      align="center"
+      direction="column"
+      p={4}
+      border="1px solid teal"
+      borderRadius="md"
+      maxW="800px"
+      width="55%"
+    >
       <Text fontSize="xl" fontWeight="bold" mb={4}>
         Your Lists 📋
       </Text>
@@ -646,19 +765,19 @@ function AddToList() {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-  
+
         const data = await response.json();
         setUserLists(data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
-  
+
     if (user) {
       fetchUserLists();
     }
   }, [user]);
-  
+
   const handleAddHeroToList = async () => {
     try {
       if (!selectedList || !heroId) {
@@ -672,15 +791,18 @@ function AddToList() {
         return;
       }
 
-      const response = await fetch(`/api/lists/${encodeURIComponent(selectedList)}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          superheroIds: [parseInt(heroId, 10)], // Ensure heroId is parsed as an integer
-        }),
-      });
+      const response = await fetch(
+        `/api/lists/${encodeURIComponent(selectedList)}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            superheroIds: [parseInt(heroId, 10)], // Ensure heroId is parsed as an integer
+          }),
+        }
+      );
 
       toast({
         title: "Successfully added Superhero to the List!",
@@ -730,8 +852,6 @@ function AddToList() {
   );
 }
 
-
-
 function UpdateDescriptionList() {
   const [userLists, setUserLists] = useState([]);
   const [selectedList, setSelectedList] = useState("");
@@ -743,25 +863,26 @@ function UpdateDescriptionList() {
     const fetchUserLists = async () => {
       try {
         if (!user) return; // Ensure user is not null or undefined
-  
+
         const response = await fetch(`/api/lists/created_by/${user.username}`);
-        
+
         if (!response.ok) {
-          throw new Error(`Failed to fetch user lists. Status: ${response.status}`);
+          throw new Error(
+            `Failed to fetch user lists. Status: ${response.status}`
+          );
         }
-  
+
         const data = await response.json();
         setUserLists(data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
-  
+
     if (user) {
       fetchUserLists();
     }
   }, [user]);
-  
 
   const handleUpdateDescription = async () => {
     try {
@@ -776,28 +897,32 @@ function UpdateDescriptionList() {
         return;
       }
 
-      const response = await fetch(`/api/lists/${encodeURIComponent(selectedList)}/description`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          description: newDescription,
-        }),
-      });
-      
+      const response = await fetch(
+        `/api/lists/${encodeURIComponent(selectedList)}/description`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            description: newDescription,
+          }),
+        }
+      );
+
       try {
         if (!response.ok) {
-          throw new Error(`Failed to update list description. Status: ${response.status}`);
+          throw new Error(
+            `Failed to update list description. Status: ${response.status}`
+          );
         }
-      
+
         const responseData = await response.json();
         // Handle success, if necessary
       } catch (error) {
         console.error("Error updating list description:", error);
         // Handle error, if necessary
       }
-      
 
       toast({
         title: "Success",
@@ -847,8 +972,6 @@ function UpdateDescriptionList() {
   );
 }
 
-
-
 function DeleteFromList() {
   const [userLists, setUserLists] = useState([]);
   const [selectedList, setSelectedList] = useState("");
@@ -860,25 +983,26 @@ function DeleteFromList() {
     const fetchUserLists = async () => {
       try {
         if (!user) return; // Ensure user is not null or undefined
-  
+
         const response = await fetch(`/api/lists/created_by/${user.username}`);
-        
+
         if (!response.ok) {
-          throw new Error(`Failed to fetch user lists. Status: ${response.status}`);
+          throw new Error(
+            `Failed to fetch user lists. Status: ${response.status}`
+          );
         }
-  
+
         const data = await response.json();
         setUserLists(data);
       } catch (error) {
         console.error("Error fetching user lists:", error);
       }
     };
-  
+
     if (user) {
       fetchUserLists();
     }
   }, [user]);
-  
 
   const handleDeleteHeroFromList = async () => {
     try {
@@ -894,11 +1018,13 @@ function DeleteFromList() {
       }
 
       const response = await fetch(
-        `/api/lists/${encodeURIComponent(selectedList)}/heroes/${encodeURIComponent(heroName)}`,
+        `/api/lists/${encodeURIComponent(
+          selectedList
+        )}/heroes/${encodeURIComponent(heroName)}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       );
