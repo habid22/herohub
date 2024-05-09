@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# HeroHub Web App
 
 ## This project was created using: JavaScript React.js, Express.js, AWS hosting and Firebase as authentication and database
 
